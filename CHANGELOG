@@ -1,0 +1,6 @@
+60da898 (HEAD -> master, origin/master) Created Main App/ entry point for the application
+c7e1091 Added Violation class, commented suggested additions
+3707f35 add ParseCSV class
+008593d delete dataset
+20467ca add project files
+0a120f3 initialize repository
