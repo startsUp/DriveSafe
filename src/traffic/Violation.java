@@ -30,21 +30,20 @@ public class Violation {
 	private boolean fatal;
 	private String violationType;
 	private String dlState;
-	private Date dateOfViolation;
+	private String dateOfViolation;
 	
 	
 	
-	public Violation(Date dateOfViolation, String timeOfStop, String agency, double[] latlong, String description,
-			boolean fatal, String violationType, String dlState) {
+	public Violation(String dateOfViolation, String timeOfStop, String agency, double[] latlong, String description) {
 		
 		this.dateOfViolation = dateOfViolation;
 		this.timeOfStop = timeOfStop;
 		this.agency = agency;
 		this.latlong = latlong;
 		this.description = description;
-		this.fatal = fatal;
-		this.violationType = violationType;
-		this.dlState = dlState;
+//		this.fatal = fatal;
+//		this.violationType = violationType;
+//		this.dlState = dlState;
 		
 	}
 
@@ -77,10 +76,15 @@ public class Violation {
 		return dlState;
 	}
 
-	public Date getDateOfViolation() {
+	public String getDateOfViolation() {
 		return dateOfViolation;
 	}
 
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return this.getDescription();
+	}
 	
 	
 }
