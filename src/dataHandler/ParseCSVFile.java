@@ -3,6 +3,7 @@ package dataHandler;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Pattern;
@@ -19,18 +20,16 @@ import traffic.Violation;
 public class ParseCSVFile {
 
 
-	protected static HashMap<Comparable<?>, Object> parseCSV(String file) {
+	protected static ArrayList<Violation> parseCSV(String file) {
 
-		HashMap<Comparable<?>, Object> data = new HashMap<>();
+		ArrayList<Violation> data = new ArrayList<>();
 
 		FileReader fr;
 		BufferedReader reader;
 		String line;
-		int i=0;
 		try {
 			fr = new FileReader(file);
 			reader = new BufferedReader(fr);
-
 			line = reader.readLine();
 			line = reader.readLine();
 			
@@ -52,12 +51,9 @@ public class ParseCSVFile {
 				}
 				long st = System.currentTimeMillis();
 				
-				data.put(i++, new Violation(lineData[0], lineData[1], lineData[2], new double[] {Double.parseDouble(lineData[6]),
+				data.add(new Violation(lineData[0], lineData[1], lineData[2], new double[] {Double.parseDouble(lineData[6]),
 						Double.parseDouble(lineData[7])}, lineData[4]));
-				//System.out.println(System.currentTimeMillis()-st);
-				//TO DO - Make DateAndTime Class with following method
-				//key = DateandTime.parse(Date, Time) returns a string/comparable object such that date and time is concatenated to form a unique key
-				//System.out.println(lineData);
+			
 				
 				line = reader.readLine();
 				
@@ -79,9 +75,10 @@ public class ParseCSVFile {
 
 	public static void main(String[] args) {
 
-		long st = System.currentTimeMillis();
+		//long st = System.currentTimeMillis();
 		ParseCSVFile.parseCSV("data/Traffic_Violations.csv");
-		System.out.println((System.currentTimeMillis()-st)/1000); //~25 secs to parse
+		//System.out.println((System.currentTimeMillis()-st)/1000); //~25 secs to pars
+		
 		System.out.println();
 	}
 }
