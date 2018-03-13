@@ -21,7 +21,7 @@ import traffic.Violation;
 public class CSVParser extends Task<ArrayList<Violation>> {
 //add test case for this class 
 	private final static String file = "data/Traffic_Violations.csv";
-	private final static double MAX_EST_PROGRESS = 1200000; //estimated valid lines
+	private final static double MAX_EST_PROGRESS = 1190000; //estimated valid lines
 	
 
 	public static void main(String[] args) throws IOException {
@@ -57,7 +57,10 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 			
 			while(line != null) {
 				//do
-				
+				if(isCancelled()) {
+					updateMessage("Cancelled");
+					break;
+				}
 				if(line.length()<100) {
 					String nextLine = reader.readLine();
 					if(nextLine != null)
@@ -76,8 +79,8 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 				data.add(new Violation(lineData[0],
 									   lineData[1],
 									   lineData[2],
-									   new double[] {Double.parseDouble(lineData[6]),
-											   		 Double.parseDouble(lineData[7])},
+									   new String[] {(lineData[6]),
+											   		 (lineData[7])},
 									   lineData[4])
 				);
 			
@@ -86,6 +89,7 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 				
 				//MAX_EST_PROGRESS can be made more precise by reading the file and every time the application is ran, the 
 				//number of lines read is stored into a file. 
+				//System.out.println(progress);
 				this.updateProgress(progress++, MAX_EST_PROGRESS);
 
 			}

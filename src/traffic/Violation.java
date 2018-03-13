@@ -22,7 +22,7 @@ public class Violation {
 	
 	private String timeOfStop;
 	private String agency;
-	private double[] latlong;
+	private String[] latlong;
 	private String description;
 	//private Driver driver;
 	//private Vehicle vehicle;
@@ -33,7 +33,7 @@ public class Violation {
 	
 	
 	
-	public Violation(String dateOfViolation, String timeOfStop, String agency, double[] latlong, String description) {
+	public Violation(String dateOfViolation, String timeOfStop, String agency, String[] latlong, String description) {
 		
 		this.dateOfViolation = dateOfViolation;
 		this.timeOfStop = timeOfStop;
@@ -55,7 +55,7 @@ public class Violation {
 		return agency;
 	}
 
-	public double[] getLatlong() {
+	public String[] getLatlong() {
 		return latlong;
 	}
 

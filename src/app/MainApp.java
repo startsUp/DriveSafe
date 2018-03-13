@@ -13,8 +13,13 @@ public class MainApp extends Application {
 	
 	private Stage window;
 	private Scene startUpScene;
-	private CSVParser parser;
+	private static CSVParser parser;
 	public static void main(String[] args) {
+		parser = new CSVParser();
+		Thread parse = new Thread(parser);
+		parse.setDaemon(true);
+		parse.start();
+		
 		launch(args);
 		//start loading data here
 		
@@ -23,8 +28,11 @@ public class MainApp extends Application {
 	@Override
 	public void start(Stage mainStage) throws Exception {
 		
+		
+		
+		
 		// TODO Auto-generated method stub
-		parser = new CSVParser();
+	//	parser = new CSVParser();
 		window = mainStage;
 		window.setTitle("App title");
 		
@@ -33,7 +41,8 @@ public class MainApp extends Application {
 		
 		window.setScene(startUpScene);
 		window.show();
-		window.setMaximized(true);
+		window.sizeToScene();
+		//window.setMaximized(true);
 		
 	}
 	
@@ -41,16 +50,18 @@ public class MainApp extends Application {
 		BorderPane b = new BorderPane();
 		final ProgressBar pb = new ProgressBar(0);
 		
-		CSVParser parser = new CSVParser();
-		new Thread(parser).start();
 		
-
-		pb.progressProperty().unbind();
+		
+	
+		//pb.progressProperty().unbind();
 		pb.progressProperty().bind(parser.progressProperty());
 		
-		
+		pb.setPrefSize(150, 10);
 		b.setCenter(pb);
-		return new Scene(b);
+		b.setPrefSize(300, 200);
+		Scene progressS = new Scene(b);
+		progressS.getStylesheets().add("App.css");
+		return progressS;
 	}
 
 }
