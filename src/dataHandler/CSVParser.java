@@ -1,14 +1,13 @@
 package dataHandler;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.regex.Pattern;
-
 import javafx.concurrent.Task;
 import traffic.Violation;
 
@@ -25,7 +24,7 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 	private final static double MAX_EST_PROGRESS = 1200000; //estimated valid lines
 	
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		
 		CSVParser parser = new CSVParser();
@@ -33,9 +32,11 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 		new Thread(parser).start();
 		
 		//to get the array list you call parser.get() 
-		
-		
-		
+//		final FileChannel channel = new FileInputStream(file).getChannel();
+//		MappedByteBuffer b = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+//		
+//		channel.close();
+//		
 	}
 
 	@Override
@@ -70,7 +71,7 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 					line = reader.readLine();
 					continue;
 				}
-				long st = System.currentTimeMillis();
+			
 				
 				data.add(new Violation(lineData[0],
 									   lineData[1],
@@ -85,7 +86,7 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 				
 				//MAX_EST_PROGRESS can be made more precise by reading the file and every time the application is ran, the 
 				//number of lines read is stored into a file. 
-				this.updateProgress(progress, MAX_EST_PROGRESS);
+				this.updateProgress(progress++, MAX_EST_PROGRESS);
 
 			}
 		} catch (IOException e) {
@@ -96,7 +97,8 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 			
 
 		}
-
+		this.updateProgress(MAX_EST_PROGRESS, MAX_EST_PROGRESS);
+		this.updateMessage("File Read");
 		System.out.println(data.get(data.size()-1));
 		return data;
 	

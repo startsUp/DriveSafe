@@ -1,6 +1,5 @@
 package traffic;
 
-import java.util.Date;
 
 public class Violation {
 
