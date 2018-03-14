@@ -1,4 +1,15 @@
-60da898 (HEAD -> master, origin/master) Created Main App/ entry point for the application
+d6436d4 (HEAD -> master, origin/master, origin/HEAD) added CSVWriter class to write back sorted data
+09d6553 Violation now stores latlong in a String array
+fb7ae14 merge
+8ce232e test progress bar
+519b52c Delete ParseCSVFile.class
+70f306b Delete ParseCSVFile.java
+3b30939 changed parsing class to support progress bar
+f1683d2 Parse data into Arraylist
+7f5bf9e ParseCSV parses data into a HashMap now
+a464fca Update DownloadCSV.java
+904f2f9 Add CHANGELOG
+60da898 Created Main App/ entry point for the application
 c7e1091 Added Violation class, commented suggested additions
 3707f35 add ParseCSV class
 008593d delete dataset
