@@ -85,5 +85,25 @@ public class Violation {
 		return this.getDescription();
 	}
 	
+	public String csvFormat() {
+		return this.getDateOfViolation() + "," +
+			   this.getTimeOfStop() + "," +
+			   this.getAgency() + "," + "N/A"+ "," +
+			   this.getDescription();
+	}
+	/*
+
+	 List of columns in the data-set:
 	
+	 [Date Of Stop, Time Of Stop, Agency, SubAgency, 
+	 Description, Location, Latitude, Longitude, Accident,
+	 Belts, Personal Injury, Property Damage, Fatal, Commercial License,
+	 HAZMAT, Commercial Vehicle, Alcohol, Work Zone, State, VehicleType,
+	 Year, Make, Model, Color, Violation Type, Charge, Article, 
+	 Contributed To Accident, Race, Gender, Driver City, Driver State, 
+	 DL State, Arrest Type, Geolocation]
+	 
+	 
+	 
+	 */
 }

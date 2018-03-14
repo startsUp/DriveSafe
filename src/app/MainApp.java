@@ -1,6 +1,9 @@
 package app;
 
+import java.util.ArrayList;
+
 import dataHandler.CSVParser;
+import dataHandler.CSVWriter;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
@@ -8,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 //import dataHandler.*;
 //import traffic.*;
+import traffic.Violation;
 
 public class MainApp extends Application {
 	
@@ -19,7 +23,13 @@ public class MainApp extends Application {
 		Thread parse = new Thread(parser);
 		parse.setDaemon(true);
 		parse.start();
-		
+//		ArrayList<Violation> v = new ArrayList<>();
+//		v.add(new Violation("12/10/12", "12:23:40", "MCP", new String[] {"24.22", "52.24"}, "Injury"));
+//		System.out.println(0);
+//		CSVWriter c = new CSVWriter(v);
+//		Thread cp = new Thread(c);
+//		cp.setDaemon(true);
+//		cp.start();
 		launch(args);
 		//start loading data here
 		

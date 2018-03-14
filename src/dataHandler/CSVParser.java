@@ -12,14 +12,14 @@ import javafx.concurrent.Task;
 import traffic.Violation;
 
 /**
- * 
+ * This class parses the CSV file: Traffic_Violation.csv under the data directory. It stores the
+ * data into an ArrayList of Violation ADT. This class extends the class Task<?> and therefore has the ability
+ * to run in the background without blocking UI updates.
  * @author shardool
- *
- * This class Parses a CSV File and returns the ArrayList of the data
- *
  */
 public class CSVParser extends Task<ArrayList<Violation>> {
-//add test case for this class 
+	
+
 	private final static String file = "data/Traffic_Violations.csv";
 	private final static double MAX_EST_PROGRESS = 1190000; //estimated valid lines
 	
@@ -27,18 +27,20 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 	public static void main(String[] args) throws IOException {
 
 		
-		CSVParser parser = new CSVParser();
-		//this starts the task of parsing the data
-		new Thread(parser).start();
+//		CSVParser parser = new CSVParser();
+//		//this starts the task of parsing the data
+//		new Thread(parser).start();
 		
-		//to get the array list you call parser.get() 
-//		final FileChannel channel = new FileInputStream(file).getChannel();
-//		MappedByteBuffer b = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-//		
-//		channel.close();
-//		
+		
 	}
 
+	/**
+	 * This method is inherited from the superclass Task<?> and is called whenever an instance of 
+	 * CSVParser is started via: new Thread(parser).start(), where parser is an instance of CSVParser.
+	 * Upon successful completion of this method another method called get() can be called using parser.get()
+	 * to obtain the ArrayList that the data was stored into.
+	 * @throws Exception an unhandled exception which occurred during the background operation
+	 */
 	@Override
 	protected ArrayList<Violation> call() throws Exception {
 
