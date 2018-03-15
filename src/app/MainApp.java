@@ -1,10 +1,14 @@
 package app;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import dataHandler.CSVParser;
 import dataHandler.CSVWriter;
+import dataHandler.sorting;
 import javafx.application.Application;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
@@ -18,6 +22,7 @@ public class MainApp extends Application {
 	private Stage window;
 	private Scene startUpScene;
 	private static CSVParser parser;
+	private static ArrayList<Violation> data;
 	public static void main(String[] args) {
 		parser = new CSVParser();
 		Thread parse = new Thread(parser);
@@ -31,8 +36,29 @@ public class MainApp extends Application {
 //		cp.setDaemon(true);
 //		cp.start();
 		launch(args);
-		//start loading data here
 		
+		//gets the arraylist once parsing is done
+		try {
+			data = parser.get();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		 parser.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			
+			@Override
+			public void handle(WorkerStateEvent event) {
+				
+				sorting s = new sorting(data);
+				
+			}
+		});
+		 
+		//call sorting class here 
+		 
 		
 	}
 	@Override
