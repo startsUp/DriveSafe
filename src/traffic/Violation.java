@@ -1,5 +1,6 @@
 package traffic;
 
+import java.util.Arrays;
 
 public class Violation {
 
@@ -94,7 +95,7 @@ public class Violation {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return this.getDescription();
+		return Arrays.toString(getLatlong());
 	}
 	
 	public String csvFormat() {
