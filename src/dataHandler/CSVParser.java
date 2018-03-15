@@ -3,6 +3,9 @@ package dataHandler;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 import javafx.concurrent.Task;
@@ -92,7 +95,7 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 				//number of lines read is stored into a file. 
 				//System.out.println(progress);
 				this.updateProgress(progress++, MAX_EST_PROGRESS);
-
+				//System.out.println(progress);
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -104,7 +107,7 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 		}
 		this.updateProgress(MAX_EST_PROGRESS, MAX_EST_PROGRESS);
 		this.updateMessage("File Read");
-		System.out.println(data.get(data.size()-1));
+		//System.out.println(data.get(data.size()-1));
 		this.succeeded();
 		return data;
 	

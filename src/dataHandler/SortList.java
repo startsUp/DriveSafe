@@ -6,15 +6,24 @@ package dataHandler;
 
 import java.util.ArrayList;
 
+import javafx.concurrent.Task;
 import traffic.Violation;
 
-public class SortList {
-	
+public class SortList{
+	private ArrayList<Violation> data;
 
-	
+	public SortList(ArrayList<Violation> data) {
+		// this arraylist is what you need to sort
+		// change all the comparables
+		this.data = data;
+		// System.out.println(data.get(0).getLatlong());
+	}
 
-	public static void sort(ArrayList<Violation> a) {
-		sort(a, 0, a.size() - 1);
+	public static void sort(ArrayList<Violation> a, int flag) {
+		sort(a, 0, a.size() - 1 , flag);
+	}
+	public ArrayList<Violation> getdata(){
+		return this.data;
 	}
 
 	/**
@@ -27,9 +36,21 @@ public class SortList {
 	 * @return 0 if they are equal, 1 if v > w, -1 if v < w. if the return value is
 	 *         less than 0, it will return false
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static boolean less(Comparable v, Comparable w) {
-		return v.compareTo(w) < 0;
+	/*
+	private static int less(String v, String w) {
+		float v_float = Float.parseFloat(v);
+		float w_float = Float.parseFloat(w);
+		if (v_float > w_float) return 1;
+		if (v_float < w_float) return -1;
+		return 0;
+	}
+	*/
+	private static boolean less(String v, String w){
+		float v_float = Float.parseFloat(v);
+		float w_float = Float.parseFloat(w);
+		if (v_float < w_float) return true;
+		if (v_float > w_float) return false;
+		return false;
 	}
 
 	/*
@@ -66,12 +87,12 @@ public class SortList {
 	 *            -right most side of array
 	 * 
 	 */
-	private static void sort(ArrayList<Violation> a, int lo, int hi) {
+	private static void sort(ArrayList<Violation> a, int lo, int hi, int flag) {
 		if (hi <= lo)
 			return;
-		int j = partition(a, lo, hi);
-		sort(a, lo, j - 1);
-		sort(a, j + 1, hi);
+		int j = partition(a, lo, hi, flag);
+		sort(a, lo, j - 1, flag);
+		sort(a, j + 1, hi, flag);
 	}
 
 	/**
@@ -85,14 +106,14 @@ public class SortList {
 	 *            - right most side of arrayList
 	 * @return
 	 */
-	private static int partition(ArrayList<Violation> a, int lo, int hi) {
+	private static int partition(ArrayList<Violation> a, int lo, int hi, int flag) {
 		int i = lo, j = hi + 1;
-		String v = a.get(lo).getLatlong()[0];
+		String v = a.get(lo).getLatlong()[flag];
 		while (true) {
-			while (less(a.get(++i).getLatlong()[0], v))
+			while (less(a.get(++i).getLatlong()[flag], v))
 				if (i == hi)
 					break;
-			while (less(a.get(--j).getLatlong()[0], v))
+			while (less(v , a.get(--j).getLatlong()[flag]))
 				if (j == lo)
 					break;
 			if (i >= j)
@@ -102,6 +123,16 @@ public class SortList {
 		exchange(a, lo, j);
 		return j;
 	}
+	public static boolean isSorted(String v, String w){
+		float v_float = Float.parseFloat(v);
+		float w_float = Float.parseFloat(w);
+		if (v_float > w_float){
+			return false;
+		}
+		return true;
+	}
 
-	
+	public static void main(String[] args) {
+		// System.out.println(data.get(0).getLatlong());
+	}
 }
