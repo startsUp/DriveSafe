@@ -1,13 +1,10 @@
 package dataHandler;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+
 import javafx.concurrent.Task;
 import traffic.Violation;
 
@@ -83,7 +80,9 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 									   lineData[2],
 									   new String[] {(lineData[6]),
 											   		 (lineData[7])},
-									   lineData[4])
+									   lineData[4],
+									   lineData[5],
+									   lineData[18])
 				);
 			
 				

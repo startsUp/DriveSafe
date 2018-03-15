@@ -24,8 +24,10 @@ public class Violation {
 	private String agency;
 	private String[] latlong;
 	private String description;
+	private String location;
 	//private Driver driver;
 	//private Vehicle vehicle;
+	private String state;
 	private boolean fatal;
 	private String violationType;
 	private String dlState;
@@ -33,14 +35,17 @@ public class Violation {
 	
 	
 	
-	public Violation(String dateOfViolation, String timeOfStop, String agency, String[] latlong, String description) {
+	public Violation(String dateOfViolation, String timeOfStop, String agency, String[] latlong, String description, String location, String state) {
 		
 		this.dateOfViolation = dateOfViolation;
 		this.timeOfStop = timeOfStop;
 		this.agency = agency;
 		this.latlong = latlong;
 		this.description = description;
+		this.location = location;
+		this.state = state;
 //		this.fatal = fatal;
+		
 //		this.violationType = violationType;
 //		this.dlState = dlState;
 		
@@ -63,10 +68,17 @@ public class Violation {
 		return description;
 	}
 
+	public String getLocation() {
+		return location;
+	}
+	
 	public boolean isFatal() {
 		return fatal;
 	}
-
+	
+	public String getState() {
+		return state;							
+	}
 	public String getViolationType() {
 		return violationType;
 	}
@@ -89,7 +101,10 @@ public class Violation {
 		return this.getDateOfViolation() + "," +
 			   this.getTimeOfStop() + "," +
 			   this.getAgency() + "," + "N/A"+ "," +
-			   this.getDescription();
+			   this.getDescription() + "," +
+			   this.getLocation() + "," +
+			   this.getLatlong()[0] + "," +
+			   this.getLatlong()[1] + ",";
 	}
 	/*
 

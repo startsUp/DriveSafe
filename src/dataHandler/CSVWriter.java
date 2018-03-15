@@ -16,7 +16,7 @@ import traffic.Violation;
 public class CSVWriter extends Task<Void>{
 	
 	private ArrayList<Violation> data;
-	private final static String file = "data/Traffic_V.csv";
+	private final static String file = "data/Traffic_V.csv"; //when this class functions correctly replace with actual file
 	
 	public CSVWriter(ArrayList<Violation> data) {
 		this.data = data;
@@ -28,7 +28,12 @@ public class CSVWriter extends Task<Void>{
 		try {
 			FileWriter fwr = new FileWriter(file);
 			BufferedWriter writer = new BufferedWriter(fwr);
-			writer.write(data.get(0).csvFormat()); // do this for all lines
+			
+			for(Violation violation: data) {
+				writer.write(violation.csvFormat());
+				writer.newLine();
+			}
+			// do this for all lines
 			writer.close();
 			
 			
