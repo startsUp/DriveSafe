@@ -105,7 +105,10 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 		this.updateProgress(MAX_EST_PROGRESS, MAX_EST_PROGRESS);
 		this.updateMessage("File Read");
 		System.out.println(data.get(data.size()-1));
+		this.succeeded();
 		return data;
 	
 	}
+	
+	
 }
