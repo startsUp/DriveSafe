@@ -6,26 +6,15 @@ package dataHandler;
 
 import java.util.ArrayList;
 
-import javafx.concurrent.Task;
 import traffic.Violation;
 
 public class SortList{
-	private ArrayList<Violation> data;
-
-	public SortList(ArrayList<Violation> data) {
-		// this arraylist is what you need to sort
-		// change all the comparables
-		this.data = data;
-		// System.out.println(data.get(0).getLatlong());
-	}
+	
 
 	public static void sort(ArrayList<Violation> a, int flag) {
 		sort(a, 0, a.size() - 1 , flag);
 	}
-	public ArrayList<Violation> getdata(){
-		return this.data;
-	}
-
+	
 	/**
 	 * Comparing 2 objects using Comparable
 	 * 
@@ -130,9 +119,5 @@ public class SortList{
 			return false;
 		}
 		return true;
-	}
-
-	public static void main(String[] args) {
-		// System.out.println(data.get(0).getLatlong());
 	}
 }

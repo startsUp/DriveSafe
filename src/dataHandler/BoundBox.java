@@ -1,15 +1,16 @@
 package dataHandler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javafx.concurrent.Task;
 import traffic.Violation;
 
 public class BoundBox {
-	private ArrayList<Violation> data;
-	private ArrayList<Violation> refined_data_X;
-	private ArrayList<Violation> refined_data_XY ;
-	private ArrayList<Violation> refined_data;
+	private static ArrayList<Violation> data;
+	private static ArrayList<Violation> refined_data_X;
+	private static ArrayList<Violation> refined_data_XY ;
+	private static ArrayList<Violation> refined_data;
 	
 	public BoundBox(ArrayList<Violation> data){
 		this.data = data;
@@ -29,9 +30,9 @@ public class BoundBox {
 				refined_data_X.add(this.data.get(i));
 			}
 		}
-		sorting s = new sorting(refined_data_X);
-		s.sort(refined_data_X, 1);
-		refined_data_XY = s.getdata();
+		
+		SortList.sort(refined_data_X, 1);
+		
 		/*
 		for(int i = 0; i < refined_data_XY.size()-1; i++){
 			if (!sorting.isSorted(refined_data_XY.get(i).getLatlong()[1],refined_data_XY.get(i+1).getLatlong()[1])){
@@ -51,7 +52,7 @@ public class BoundBox {
 		else{
 			refined_data = new ArrayList<>();
 			for (int i = first_index; i <= last_index; i++){
-				refined_data.add(refined_data_XY.get(i));
+				refined_data.add(refined_data_X.get(i));
 			}	
 		}
 		System.out.println("++++++++++++++++++++++++++++++++++++");

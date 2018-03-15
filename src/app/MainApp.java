@@ -1,12 +1,10 @@
 package app;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
+import dataHandler.BoundBox;
 import dataHandler.CSVParser;
-import dataHandler.CSVWriter;
-import dataHandler.sorting;
+import dataHandler.SortList;
 import javafx.application.Application;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -17,7 +15,6 @@ import javafx.stage.Stage;
 //import dataHandler.*;
 //import traffic.*;
 import traffic.Violation;
-import dataHandler.BoundBox;
 
 public class MainApp extends Application {
 	
@@ -78,9 +75,7 @@ public class MainApp extends Application {
 				System.out.println("Reading Data: Complete");
 				data = parser.getValue();
 				System.out.println("Sorting Data:");
-				sorting s = new sorting(data);
-				s.sort(data, 0);
-				ArrayList<Violation> sorted_data = s.getdata();
+				SortList.sort(data, 0);
 				System.out.println("Sorting Data: Complete");
 				/*
 				for(int i = 0; i <= 1000; i++){
@@ -88,16 +83,16 @@ public class MainApp extends Application {
 				}
 				*/
 				System.out.println("Checking isSorted:");
-				for(int i = 0; i < sorted_data.size()-1; i++){
-					if (!sorting.isSorted(sorted_data.get(i).getLatlong()[0],sorted_data.get(i+1).getLatlong()[0])){
+				for(int i = 0; i < data.size()-1; i++){
+					if (!SortList.isSorted(data.get(i).getLatlong()[0],data.get(i+1).getLatlong()[0])){
 						System.out.println("Checking isSorted: Failed");
 					}
 				}
 				System.out.println("Checking isSorted: Passed!");
 				
 				System.out.println("Starting BoundBox");
-				BoundBox b = new BoundBox(sorted_data);
-				b.Bounding(sorted_data, -94.6109883333333, -71.2857083333333, 37.0383713333333, 41.5120733333333);
+				BoundBox b = new BoundBox(data);
+				b.Bounding(data, -94.6109883333333, -71.2857083333333, 37.0383713333333, 41.5120733333333);
 				System.out.println("Starting BoundBox: Complete");
 			}
 		});
