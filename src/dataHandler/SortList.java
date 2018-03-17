@@ -11,6 +11,7 @@ import traffic.Violation;
 public class SortList{
 	
 
+	
 	public static void sort(ArrayList<Violation> a, int flag) {
 		sort(a, 0, a.size() - 1 , flag);
 	}

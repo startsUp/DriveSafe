@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
 
+import app.MainApp;
 import javafx.concurrent.Task;
 import traffic.Violation;
 
@@ -17,7 +18,7 @@ import traffic.Violation;
 public class CSVWriter extends Task<Void>{
 	
 	private ArrayList<Violation> data;
-	private final static String file = "data/Traffic_V.csv"; //when this class functions correctly replace with actual file
+	
 	
 	public CSVWriter(ArrayList<Violation> data) {
 		this.data = data;
@@ -27,7 +28,7 @@ public class CSVWriter extends Task<Void>{
 		//write data into Traffic_Violation.csv
 		
 		try {
-			FileWriter fwr = new FileWriter(file);
+			FileWriter fwr = new FileWriter(MainApp.DATASET);
 			BufferedWriter writer = new BufferedWriter(fwr);
 			
 			for(Violation violation: data) {

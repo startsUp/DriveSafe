@@ -1,15 +1,13 @@
 package dataHandler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import javafx.concurrent.Task;
 import traffic.Violation;
 
 public class BoundBox {
-	private static ArrayList<Violation> data;
+	private ArrayList<Violation> data;
 	private static ArrayList<Violation> refined_data_X;
-	private static ArrayList<Violation> refined_data_XY ;
+	//private static ArrayList<Violation> refined_data_XY ;
 	private static ArrayList<Violation> refined_data;
 	
 	public BoundBox(ArrayList<Violation> data){

@@ -1,13 +1,12 @@
 package dataHandler;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
+import app.MainApp;
 import javafx.concurrent.Task;
 import traffic.Violation;
 
@@ -20,19 +19,8 @@ import traffic.Violation;
 public class CSVParser extends Task<ArrayList<Violation>> {
 	
 
-	private final static String file = "data/Traffic_Violations.csv";
 	private final static double MAX_EST_PROGRESS = 1190000; //estimated valid lines
 	
-
-	public static void main(String[] args) throws IOException {
-
-		
-//		CSVParser parser = new CSVParser();
-//		//this starts the task of parsing the data
-//		new Thread(parser).start();
-		
-		
-	}
 
 	/**
 	 * This method is inherited from the superclass Task<?> and is called whenever an instance of 
@@ -45,70 +33,42 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 	protected ArrayList<Violation> call() throws Exception {
 
 		ArrayList<Violation> data = new ArrayList<>();
+		final Pattern REGEX = Pattern.compile(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 		
-		FileReader fr;
-		BufferedReader reader;
-		String line;
+		List<String> allLines = Files.readAllLines(Paths.get(MainApp.DATASET));
+		
+		int i=1;
 		int progress = 0;
 		
-		try {
-			fr = new FileReader(file);
-			reader = new BufferedReader(fr);
-			line = reader.readLine();
-			line = reader.readLine();
+		long st = System.currentTimeMillis();
+		
+		while(i<allLines.size()) {
 			
-			while(line != null) {
-				//do
-				if(isCancelled()) {
-					updateMessage("Cancelled");
-					break;
-				}
-				if(line.length()<100) {
-					String nextLine = reader.readLine();
-					if(nextLine != null)
-						line = line+nextLine;
-				}
-
-				String[] lineData = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-				
-				//skip line if no geo-location information is available
-				if(lineData[6].isEmpty() || lineData[7].isEmpty()) {
-					line = reader.readLine();
-					continue;
-				}
+			String line = allLines.get(i);
+			allLines.set(i, null);
 			
-				
-				data.add(new Violation(lineData[0],
-									   lineData[1],
-									   lineData[2],
-									   new String[] {(lineData[6]),
-											   		 (lineData[7])},
-									   lineData[4],
-									   lineData[5],
-									   lineData[18])
-				);
-			
-				
-				line = reader.readLine();
-				
-				//MAX_EST_PROGRESS can be made more precise by reading the file and every time the application is ran, the 
-				//number of lines read is stored into a file. 
-				//System.out.println(progress);
-				this.updateProgress(progress++, MAX_EST_PROGRESS);
-				//System.out.println(progress);
+			if(line.length()<100 && (++i)<allLines.size()) {
+				line+=allLines.get(i);
+				allLines.set(i, null);
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			//System.out.println(line);
-			e.printStackTrace();
-
 			
-
+			String[] lineData = REGEX.split(line);
+			
+			//skip line if no geo-location information is available
+			if(lineData[6].isEmpty() || lineData[7].isEmpty()) { i++; continue;}
+		
+			data.add(new Violation(lineData[0],lineData[1],lineData[2], new String[] {(lineData[6]),(lineData[7])}, lineData[4],lineData[5],lineData[18]));
+			
+			this.updateProgress(progress++, MAX_EST_PROGRESS);
+			i++;	
 		}
+		
+		allLines = null;
 		this.updateProgress(MAX_EST_PROGRESS, MAX_EST_PROGRESS);
 		this.updateMessage("File Read");
-		//System.out.println(data.get(data.size()-1));
 		this.succeeded();
+		
+		System.out.println(System.currentTimeMillis()-st);
 		return data;
 	
 	}
