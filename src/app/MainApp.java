@@ -2,8 +2,8 @@ package app;
 
 import java.util.ArrayList;
 
-import dataHandler.BoundBox;
 import dataHandler.CSVParser;
+import dataHandler.HandleSort;
 import dataHandler.SortList;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -21,10 +21,11 @@ public class MainApp extends Application {
 	private Scene startUpScene;
 
 	public final static String DATASET = "data/Traffic_Violations.csv"; 
-
+	public final static String DATASET_STATUS = "data/D_status.txt"; 
+	
 	private static CSVParser parser;
 	private static ArrayList<Violation> data;
-
+	private static ProgressBar parsingProgress;
 
 	public static void main(String[] args) throws Exception{
 
@@ -37,8 +38,6 @@ public class MainApp extends Application {
 
 		launch(args);
 		//gets the arraylist once parsing is done
-
-
 		//call sorting class here 
 
 
@@ -48,64 +47,68 @@ public class MainApp extends Application {
 
 		window = mainStage;
 		window.setTitle("DriveSafe");
-		startUpScene = getStartUpScreen();
+		startUpScene = getNewScene();
 		window.setScene(startUpScene);
 		window.show();
 		window.sizeToScene();
 		
 		parser.setOnSucceeded(e -> {
 			data = parser.getValue();
-			window.setScene(getNewScene());
+			//window.setScene(getNewScene());
+			if(!HandleSort.isDataSorted(DATASET_STATUS))
+				SortList.sort(data, 0);
 		});
 		
 
 	}
 
-	private Scene getStartUpScreen() {
-		BorderPane b = new BorderPane();
-		final ProgressBar pb = new ProgressBar(0);		
-		//pb.progressProperty().unbind();
-		pb.progressProperty().bind(parser.progressProperty());
-
-		pb.setPrefSize(150, 25);
-		b.setCenter(pb);
-		b.setPrefSize(300, 200);
-		Scene progressS = new Scene(b);
-		progressS.getStylesheets().add("App.css");
-		return progressS;
-	}
+	
 
 	private Scene getNewScene() {
 
 
 		BorderPane b = new BorderPane();
-		Button bs = new Button("Map");		
-		//pb.progressProperty().unbind();
-		System.out.println("Sorting Data:");
-		SortList.sort(data, 0);
-		System.out.println("Sorting Data: Complete");
-		/*
-		for(int i = 0; i <= 1000; i++){
-			System.out.printf("%s:%s\n",sorted_data.get(i).getLatlong()[0],sorted_data.get(i).getLatlong()[1]);					
-		}
-		 */
-		System.out.println("Checking isSorted:");
-		for(int i = 0; i < data.size()-1; i++){
-			if (!SortList.isSorted(data.get(i).getLatlong()[0],data.get(i+1).getLatlong()[0])){
-				System.out.println("Checking isSorted: Failed");
-			}
-		}
-		System.out.println("Checking isSorted: Passed!");
+		Button bs = new Button("Map");	
+		
+		bs.setOnAction(e->{
+			showMapScene();
+		});
+	
+		//TO DO- make unit test for each class
+		//SortList.sort(data, 0);
+		parsingProgress = new ProgressBar(0);
+		parsingProgress.progressProperty().bind(parser.progressProperty());
 
-		System.out.println("Starting BoundBox");
-		BoundBox bx = new BoundBox(data);
-		bx.Bounding(data, -94.6109883333333, -71.2857083333333, 37.0383713333333, 41.5120733333333);
-		System.out.println("Starting BoundBox: Complete");
+		parsingProgress.setPrefSize(150, 25);
+		b.setTop(parsingProgress);
+		b.setPrefSize(300, 200);
+		
+	
+
+		
+//		BoundBox bx = new BoundBox(data);
+//		bx.Bounding(data, -94.6109883333333, -71.2857083333333, 37.0383713333333, 41.5120733333333);
+//		System.out.println("Starting BoundBox: Complete");
+		
+		
 		b.setCenter(bs);
 		b.setPrefSize(300, 200);
 		Scene map = new Scene(b);
 		return map;
 	}
+	
+	public void showMapScene() {
+		Map map = new Map();
+		BorderPane mapView = map.getGooogleMap();
+		
+		//parsingProgress.setPrefSize(150, 25);
+		
+		mapView.setBottom(parsingProgress);
+		
+		Scene s = new Scene(mapView);
+		window.setScene(s);
+	}
 
+	
 }
 
