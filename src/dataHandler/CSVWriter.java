@@ -1,8 +1,8 @@
 package dataHandler;
 
-import java.io.BufferedWriter;
-
-import java.io.FileWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import app.MainApp;
@@ -23,30 +23,23 @@ public class CSVWriter extends Task<Void>{
 	public CSVWriter(ArrayList<Violation> data) {
 		this.data = data;
 	}
+	
 	@Override
 	protected Void call() throws Exception {
 		//write data into Traffic_Violation.csv
 		
 		try {
-			FileWriter fwr = new FileWriter(MainApp.DATASET);
-			BufferedWriter writer = new BufferedWriter(fwr);
+		
+			ArrayList<String> lines = new ArrayList<>();
+			for(Violation v: data)
+				lines.add(v.csvFormat());
 			
-			for(Violation violation: data) {
-				writer.write(violation.csvFormat());
-				writer.newLine();
-			}
-			// do this for all lines
-			writer.close();
-			
+			Files.write(Paths.get(MainApp.DATASET), lines, Charset.forName("UTF-8"));	
 			
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 		return null;
-	}
-	
-	public static void main(String[] args) {
-		
 	}
 
 }

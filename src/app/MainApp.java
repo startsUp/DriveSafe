@@ -3,14 +3,14 @@ package app;
 import java.util.ArrayList;
 
 import dataHandler.CSVParser;
-import dataHandler.HandleSort;
-import dataHandler.SortList;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import sorting.HandleSort;
+import sorting.SortList;
 //import dataHandler.*;
 //import traffic.*;
 import traffic.Violation;
@@ -24,6 +24,7 @@ public class MainApp extends Application {
 	public final static String DATASET_STATUS = "data/D_status.txt"; 
 	
 	private static CSVParser parser;
+	private static Thread parsingThread;
 	private static ArrayList<Violation> data;
 	private static ProgressBar parsingProgress;
 
@@ -32,9 +33,9 @@ public class MainApp extends Application {
 		
 		//start parser in the background as soon as App starts 
 		parser = new CSVParser();
-		Thread parse = new Thread(parser);
-		parse.setDaemon(true);
-		parse.start();
+		parsingThread = new Thread(parser);
+		parsingThread.setDaemon(true);
+		parsingThread.start();
 
 		launch(args);
 		//gets the arraylist once parsing is done
@@ -71,7 +72,7 @@ public class MainApp extends Application {
 		Button bs = new Button("Map");	
 		
 		bs.setOnAction(e->{
-			showMapScene();
+			showMapScene(); 
 		});
 	
 		//TO DO- make unit test for each class
@@ -98,11 +99,18 @@ public class MainApp extends Application {
 	}
 	
 	public void showMapScene() {
+		
+		
+//		if(parser.isRunning())
+//			try {
+//				parse.join();
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+		
 		Map map = new Map();
-		BorderPane mapView = map.getGooogleMap();
-		
-		//parsingProgress.setPrefSize(150, 25);
-		
+		BorderPane mapView = map.getGooogleMap(data);
 		mapView.setBottom(parsingProgress);
 		
 		Scene s = new Scene(mapView);

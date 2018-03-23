@@ -1,8 +1,11 @@
 package app;
 
-import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.ProgressBar;
@@ -10,11 +13,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
+import traffic.*;
 import netscape.javascript.JSObject;
 
 public class Map {
 
-	public BorderPane getGooogleMap(){
+	public BorderPane getGooogleMap(ArrayList<Violation> data){
 
 		BorderPane mapPane = new BorderPane();
 
@@ -50,6 +54,27 @@ public class Map {
 				(JSObject) webEngine.executeScript("window");
 		//win.setMember(, value);
 
+		//plot all the pins
+//		webEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
+//			@Override
+//			public void changed(ObservableValue<? extends State> value,
+//					State oldState, State newState) {
+//				if(newState == State.SUCCEEDED){
+//				
+//						for(Violation v: data){
+//
+//							String[] latlong = v.getLatlong();
+//							webEngine.executeScript("" +
+//									"window.lat = " + latlong[0] + ";" +
+//									"window.lon = " +  latlong[1] + ";"+
+//									"var locName =  \""+ v.getState() + "\"" +";"+   //Location Name 
+//									"document.addMarker(window.lat, window.lon, locName);"
+//									);
+//						}
+//					}
+//				}
+//			
+//		});
 
 
 		mapPane.setTop(prog);

@@ -2,7 +2,7 @@
  * @author Vaibhav Chadha and Usman Irfan
  * @version Eclipse Oxygen
  */
-package dataHandler;
+package sorting;
 
 import java.util.ArrayList;
 
@@ -36,10 +36,10 @@ public class SortList{
 	}
 	*/
 	private static boolean less(String v, String w){
-		float v_float = Float.parseFloat(v);
-		float w_float = Float.parseFloat(w);
-		if (v_float < w_float) return true;
-		if (v_float > w_float) return false;
+		Double v_double = Double.parseDouble(v);
+		Double w_double = Double.parseDouble(w);
+		if (v_double < w_double) return true;
+		if (v_double > w_double) return false;
 		return false;
 	}
 
