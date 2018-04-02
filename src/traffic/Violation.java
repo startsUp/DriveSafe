@@ -1,5 +1,7 @@
 package traffic;
 
+import java.util.Arrays;
+
 public class Violation {
 
 	/*
@@ -93,17 +95,22 @@ public class Violation {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return this.description;
+		return this.description + " " + Arrays.toString(this.getLatlong());
 	}
 	
 	public String csvFormat() {
 		return this.getDateOfViolation() + "," +
 			   this.getTimeOfStop() + "," +
-			   this.getAgency() + "," + "N/A"+ "," +
+			   this.getAgency() + "," + "N,A"+ "," +
 			   this.getDescription() + "," +
 			   this.getLocation() + "," +
 			   this.getLatlong()[0] + "," +
-			   this.getLatlong()[1] + ",";
+			   this.getLatlong()[1] + ",N/A" + ",N/A"  + ",N/A" +
+			   ",N/A" + ",N/A"  + ",N/A" +
+			   ",N/A" + ",N/A"  + ",N/A" +
+			   ",N/A" + ",N/A"  + "," +
+			   this.getState();
+			   
 	}
 	/*
 

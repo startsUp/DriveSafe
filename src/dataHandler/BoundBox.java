@@ -6,6 +6,8 @@ import sorting.SortList;
 import traffic.Violation;
 
 public class BoundBox {
+	
+	
 	private ArrayList<Violation> data;
 	private static ArrayList<Violation> refined_data_X;
 	//private static ArrayList<Violation> refined_data_XY ;
@@ -14,6 +16,8 @@ public class BoundBox {
 	public BoundBox(ArrayList<Violation> data){
 		this.data = data;
 	}
+	
+	
 	public void Bounding(ArrayList<Violation> a, double x_lo, double x_hi , double y_lo, double y_hi){
 		int first_index = 0;
 		int last_index = 75;

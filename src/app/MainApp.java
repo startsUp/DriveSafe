@@ -1,13 +1,16 @@
 package app;
 
+
 import java.util.ArrayList;
 
 import dataHandler.CSVParser;
+import dataHandler.CSVWriter;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import sorting.HandleSort;
 import sorting.SortList;
@@ -19,12 +22,16 @@ public class MainApp extends Application {
 
 	private Stage window;
 	private Scene startUpScene;
+	private Scene loadingScene;
 
-	public final static String DATASET = "data/Traffic_Violations.csv"; 
-	public final static String DATASET_STATUS = "data/D_status.txt"; 
+	private final static String DATASET = "data/Traffic_Violations.csv"; 
+//	private final static String DATASET_TEST = "data/Traffic_V.csv"; 
+	private final static String DATASET_STATUS = "data/D_status.txt"; 
 	
 	private static CSVParser parser;
 	private static Thread parsingThread;
+	private static Thread sortingThread;
+	private static Thread writingThread;
 	private static ArrayList<Violation> data;
 	private static ProgressBar parsingProgress;
 
@@ -32,14 +39,14 @@ public class MainApp extends Application {
 
 		
 		//start parser in the background as soon as App starts 
-		parser = new CSVParser();
+		parser = new CSVParser(DATASET);
 		parsingThread = new Thread(parser);
+		
+		parsingThread.setPriority(Thread.MAX_PRIORITY);
 		parsingThread.setDaemon(true);
 		parsingThread.start();
 
 		launch(args);
-		//gets the arraylist once parsing is done
-		//call sorting class here 
 
 
 	}
@@ -47,17 +54,48 @@ public class MainApp extends Application {
 	public void start(Stage mainStage) throws Exception {
 
 		window = mainStage;
+
 		window.setTitle("DriveSafe");
 		startUpScene = getNewScene();
+		getLoadingScreen();
 		window.setScene(startUpScene);
-		window.show();
+		//window.show();
 		window.sizeToScene();
 		
 		parser.setOnSucceeded(e -> {
 			data = parser.getValue();
-			//window.setScene(getNewScene());
+			
+			//if data is not parsed, parse and update the dataset
 			if(!HandleSort.isDataSorted(DATASET_STATUS))
-				SortList.sort(data, 0);
+			{
+				SortList sort = new SortList(data, 0);
+				sortingThread = new Thread(sort);
+				sortingThread.start();
+				try {
+					sortingThread.join();
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				parsingProgress.progressProperty().unbind();
+				parsingProgress.progressProperty().bind(sort.progressProperty());
+				CSVWriter writer = new CSVWriter(data, DATASET);
+				writingThread = new Thread(writer);
+				writingThread.start();
+				HandleSort.updateStatus(DATASET_STATUS, true);
+				
+			}
+			
+			
+			window.setScene(startUpScene);
+			window.show();
+			
+			//window.setScene(getNewScene());
+			
+				
+			System.out.println(data.get(0));
+			System.out.println(data.size());
 		});
 		
 
@@ -95,6 +133,7 @@ public class MainApp extends Application {
 		b.setCenter(bs);
 		b.setPrefSize(300, 200);
 		Scene map = new Scene(b);
+		map.getStylesheets().add("App.css");
 		return map;
 	}
 	
@@ -108,15 +147,42 @@ public class MainApp extends Application {
 //				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
+		Button getData = new Button("Data");
+		
+		getData.setOnAction(e->{
+			if(parser.isRunning())
+				try {
+	
+					
+					HBox s = new HBox(parsingProgress);
+					
+					Stage prog = new Stage();
+					prog.setScene(new Scene(s));
+					prog.show();
+					
+					
+				} catch (Exception e2) {
+					// TODO: handle exception
+				}
+			System.out.println(data.get(0));
+		});
 		
 		Map map = new Map();
 		BorderPane mapView = map.getGooogleMap(data);
 		mapView.setBottom(parsingProgress);
-		
+		mapView.setTop(getData);
 		Scene s = new Scene(mapView);
 		window.setScene(s);
 	}
 
-	
+	public void getLoadingScreen()
+	{
+		Stage s = new Stage();
+		HBox g = new HBox(parsingProgress);
+		s.setScene(new Scene(g));
+		s.show();
+		
+		
+	}
 }
 

@@ -9,6 +9,7 @@
 <body>
 <div id="mapcanvas">
     <script type="text/javascript">
+
         document.map = new google.maps.Map(document.getElementById("mapcanvas"));
         var latlng = new google.maps.LatLng(38.95272, -76.70125);
         var Options = {
@@ -16,15 +17,43 @@
             center: latlng,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
-
+        var markers = [];
         var map = new google.maps.Map(document.getElementById("mapcanvas"), Options);
+        map.addListener('click', function(e) {
+          placeMarker(e.latLng, map);
+          upcall(e.latLng);
+        });
+       
+
+        var placeMarker = function(latLng, map) {
+          var marker = new google.maps.Marker({
+            position: latLng,
+            animation: google.maps.Animation.DROP,
+            map: map
+          });
+          
+          console.log(markers);
+          updateOld(marker, null);
+        }
+
+        var updateOld = function(marker, map) {
+            if (markers.length!=0)
+              {
+                markers[0].setMap(map);
+                markers[0] = marker;
+              }
+            else
+                markers.push(marker); 
+        }
+
+        var upcall = function(latlng){
+          app.pt(latlng.toString());
+        
+        }
 
 
 
-
-
-
- 		document.addMarker = function(x, y, name) {
+    document.addMarker = function(x, y, name) {
             var marker = new google.maps.Marker({
             position: new google.maps.LatLng(x, y),
             map: map,

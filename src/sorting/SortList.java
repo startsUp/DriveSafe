@@ -6,11 +6,19 @@ package sorting;
 
 import java.util.ArrayList;
 
+import javafx.concurrent.Task;
 import traffic.Violation;
 
-public class SortList{
+public class SortList extends Task<Void>{
 	
-
+   private static ArrayList<Violation> data;
+   private static int flag;
+   
+   public SortList(ArrayList<Violation> data, int flag) {
+	   this.data = data; //store the reference
+	   this.flag = flag;
+	// TODO Auto-generated constructor stub
+}
 	
 	public static void sort(ArrayList<Violation> a, int flag) {
 		sort(a, 0, a.size() - 1 , flag);
@@ -120,5 +128,11 @@ public class SortList{
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	protected Void call() throws Exception {
+		sort(data, flag);
+		return null;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -13,9 +14,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
-import traffic.*;
 import netscape.javascript.JSObject;
-
+import traffic.Violation;
 public class Map {
 
 	public BorderPane getGooogleMap(ArrayList<Violation> data){
@@ -50,9 +50,7 @@ public class Map {
 		webEngine.setOnStatusChanged(e->{
 			System.out.println(e);
 		});
-		JSObject win = 
-				(JSObject) webEngine.executeScript("window");
-		//win.setMember(, value);
+		
 
 		//plot all the pins
 //		webEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
@@ -77,53 +75,44 @@ public class Map {
 //		});
 
 
-		mapPane.setTop(prog);
-		mapPane.setCenter(webView);
 
 
 
-
-
-
-
+		webEngine.setJavaScriptEnabled(true);
 		//		reload.setOnAction(e-> webEngine.reload());
 		//		rightB.getChildren().addAll(reload, add);
+		JSObject win = (JSObject) webEngine.executeScript("window");
+        win.setMember("app", new UpCallTest());
+
+		webEngine.getLoadWorker().stateProperty().addListener(
+	            new ChangeListener<Worker.State>() {
+	                public void changed(ObservableValue<? extends State> ov, Worker.State oldState, Worker.State newState) {
+	                    if (newState == Worker.State.SUCCEEDED) {                
+	                    	System.out.println(0);
+	                    	JSObject win = (JSObject) webEngine.executeScript("window");
+	                        win.setMember("app", new UpCallTest());
+	                    }
+
+	                }
+	            });
+		webEngine.setOnError(e -> {
+			System.out.println(e);
+		});
 
 
 
 
 
 
-		//		//ADD PINS TO MAP FOR ADDED LOCS
-		//		webEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
-		//			@Override
-		//			public void changed(ObservableValue<? extends State> value,
-		//					State oldState, State newState) {
-		//				if(newState == State.SUCCEEDED){
-		//					ArrayList<String> extraLocs = allLocations.getAddedLoc();
-		//
-		//					if(extraLocs.size()!=0){
-		//						for(String nameLoc: extraLocs){
-		//
-		//							Location l = locations.get(locIndex.get(nameLoc));
-		//							webEngine.executeScript("" +
-		//									"window.lat = " + l.getLat() /*loc.lat*/ + ";" +
-		//									"window.lon = " + l.getLon() /*loc.lon*/ + ";"+
-		//									"var locName =  \""+ nameLoc+ "\"" +";"+   //Location Name 
-		//									"document.addMarker(window.lat, window.lon, locName);"
-		//									);
-		//						}
-		//					}
-		//				}
-		//			}
-		//		});
-
-
-
-
+		mapPane.setTop(prog);
+		mapPane.setCenter(webView);
 
 
 		return mapPane;
 
 	}
+
+	
+	
+ 
 }
