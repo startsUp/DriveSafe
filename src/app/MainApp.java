@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import sorting.HandleSort;
 import sorting.SortList;
@@ -24,11 +23,12 @@ public class MainApp extends Application {
 	private Stage window;
 	private Scene startUpScene;
 	private Scene loadingScene;
+	private Stage loadingStage;
 
 	private final static String DATASET = "data/Traffic_Violations.csv"; 
 //	private final static String DATASET_TEST = "data/Traffic_V.csv"; 
-	private final static String DATASET_STATUS = "data/D_status.txt"; 
-	
+	public final static String DATASET_STATUS = "data/D_status.txt"; 
+	private static boolean isDataSorted;
 	private static CSVParser parser;
 	private static Thread parsingThread;
 	private static Thread sortingThread;
@@ -88,7 +88,7 @@ public class MainApp extends Application {
 				
 			}
 			
-			
+			loadingStage.close();
 			window.setScene(startUpScene);
 			window.show();
 			
@@ -178,10 +178,10 @@ public class MainApp extends Application {
 
 	public void getLoadingScreen()
 	{
-		Stage s = new Stage();
+		loadingStage = new Stage();
 		HBox g = new HBox(parsingProgress);
-		s.setScene(new Scene(g));
-		s.show();
+		loadingStage.setScene(new Scene(g));
+		loadingStage.show();
 		
 		
 	}

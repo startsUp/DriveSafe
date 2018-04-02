@@ -3,13 +3,13 @@ package dataHandler;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.swing.plaf.synth.SynthSpinnerUI;
-
+import app.MainApp;
 import javafx.concurrent.Task;
+import jdk.nashorn.internal.parser.JSONParser;
+import sorting.HandleSort;
 import traffic.Violation;
 
 /**
@@ -39,11 +39,12 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 
 		ArrayList<Violation> data = new ArrayList<>();
 		final Pattern REGEX = Pattern.compile(",");
-
+		
 		List<String> allLines = Files.readAllLines(Paths.get(this.file));
 
 		int i=1;
 		int progress = 0;
+		boolean sorted = HandleSort.isDataSorted(MainApp.DATASET_STATUS);
 
 		long st = System.currentTimeMillis();
 
@@ -59,33 +60,48 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 			
 			
 			String[] lineData = REGEX.split(line);
-			
+			int len = lineData.length;
 			//skip line if no geo-location information is available
-			if(lineData[7].isEmpty() || lineData[8].isEmpty()) { i++; continue;}
-			int ltlngIndex=7;
-
-			do
+			if(!sorted)
 			{
+				if(lineData[len-1].isEmpty()) { i++; continue;}
+
+				String lng;
+				String lat;
 				try {
-					
-					double lt = Double.parseDouble(lineData[ltlngIndex]);
-					double lng = Double.parseDouble(lineData[ltlngIndex+1]);
-					if(Math.abs(lt)>200) {ltlngIndex++; continue;} 
+					lng = lineData[len-1].substring(0, lineData[len-1].length()-2);
+					lat = lineData[len-2].substring(2);
+					Double.parseDouble(lng);
+					Double.parseDouble(lat);
 				} catch (Exception e) {
-					ltlngIndex++;
-					//System.out.println(index);
-					if(ltlngIndex>15) break;
+					
+					i++; 
 					continue;
 				}
-				break;
-			}while(true);
+				if(Math.abs(Double.parseDouble(lng))<50)
+				{
+					String tmp = lat;
+					lat = lng;
+					lng = tmp;
+				}
+					
 			
-			if (ltlngIndex>15) { i++; continue;}
-			
-			data.add(new Violation(lineData[0],lineData[1],lineData[2], new String[] {(lineData[ltlngIndex]),(lineData[ltlngIndex+1])}, lineData[ltlngIndex-2],lineData[ltlngIndex-1],lineData[ltlngIndex+12]));
+				data.add(new Violation(lineData[0],lineData[1],lineData[2], new String[] {lat , lng}, lineData[5],lineData[6],lineData[len-18]));
 
-			this.updateProgress(progress++, MAX_EST_PROGRESS);
-			i++;	
+				this.updateProgress(progress++, MAX_EST_PROGRESS);
+				i++;	
+			}
+			else 
+			{
+	
+			//	System.out.println(lat);
+				
+				data.add(new Violation(lineData[0],lineData[1],lineData[2], new String[] {lineData[7] , lineData[8]}, lineData[5],lineData[6],lineData[len-18]));
+				this.updateProgress(progress++, MAX_EST_PROGRESS);
+				i++;
+			}
+					
+			
 		}
 
 		allLines = null;
@@ -94,6 +110,7 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 		this.succeeded();
 
 		System.out.println(System.currentTimeMillis()-st);
+		
 		return data;
 
 	}

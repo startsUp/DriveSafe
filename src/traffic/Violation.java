@@ -109,7 +109,13 @@ public class Violation {
 			   ",N/A" + ",N/A"  + ",N/A" +
 			   ",N/A" + ",N/A"  + ",N/A" +
 			   ",N/A" + ",N/A"  + "," +
-			   this.getState();
+			   this.getState() + 
+			   "," + ","  + "," +
+			   "," + ","  + "," +
+			   "," + ","  + "," +
+			   "," + ","  + "," +
+			   "," + ","  + ",," +
+			   "("+this.getLatlong()[0] +"," + this.getLatlong()[1] + ")";
 			   
 	}
 	/*

@@ -52,6 +52,7 @@ public class BoundBox {
 			System.out.println("Could not find points in range");
 			return;
 		}
+		
 		else{
 			refined_data = new ArrayList<>();
 			for (int i = first_index; i <= last_index; i++){
