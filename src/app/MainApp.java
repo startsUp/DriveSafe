@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import sorting.HandleSort;
 import sorting.SortList;
@@ -169,8 +170,8 @@ public class MainApp extends Application {
 		
 		Map map = new Map();
 		BorderPane mapView = map.getGooogleMap(data);
-		mapView.setBottom(parsingProgress);
-		mapView.setTop(getData);
+//		mapView.setBottom(parsingProgress);
+//		mapView.setTop(getData);
 		Scene s = new Scene(mapView);
 		window.setScene(s);
 	}

@@ -18,6 +18,9 @@
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         var markers = [];
+        var rectangles = [];
+        var heatmap;
+        var dataPoints = [];
         var map = new google.maps.Map(document.getElementById("mapcanvas"), Options);
         map.addListener('click', function(e) {
           placeMarker(e.latLng, map);
@@ -47,10 +50,41 @@
         }
 
         var upcall = function(latlng){
-          app.pt(latlng.toString());
+          app.changeLatLong(latlng.toString());
         
         }
 
+        document.addDataPoint = function(x, y){
+            dataPoints.push(new google.maps.LatLng(x, y));
+        }
+
+        var showBox = function(x, y, x2, y2){
+          if(rectangles.length==1)
+            rectangles[0].setMap(null);
+
+          var rectangle = new google.maps.Rectangle({
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.2,
+          map: map,
+          bounds: new google.maps.LatLngBounds(new google.maps.LatLng(x,y), 
+                  new google.maps.LatLng(x2, y2)),
+        });
+          rectangles[0] = rectangle;
+        }
+
+        document.addHeatMapLayer = function(){
+          heatmap = new google.maps.visualization.HeatmapLayer({
+                    data: dataPoints,
+                    map: map
+            });
+        }   
+
+      function toggleHeatmap() {
+        heatmap.setMap(heatmap.getMap() ? null : map);
+      }
 
 
     document.addMarker = function(x, y, name) {
