@@ -28,6 +28,7 @@ public class MainApp extends Application {
 	private final static String DATASET = "data/Traffic_Violations.csv"; 
 //	private final static String DATASET_TEST = "data/Traffic_V.csv"; 
 	public final static String DATASET_STATUS = "data/D_status.txt"; 
+	
 	private static boolean isDataSorted;
 	private static CSVParser parser;
 	private static Thread parsingThread;
@@ -48,7 +49,7 @@ public class MainApp extends Application {
 		parsingThread.start();
 
 		launch(args);
-
+		
 
 	}
 	@Override

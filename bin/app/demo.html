@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script src="http://maps.google.com/maps/api/js?sensor=false&libraries=visualization"></script>
     <style>#mapcanvas { height: 885px; width: 100%}
      body { margin:0;}
     </style>
@@ -10,17 +10,19 @@
 <div id="mapcanvas">
     <script type="text/javascript">
 
+        var markers = [];
+        var rectangles = [];
+        var heatmaps = [];
+        var dataPoints = [];
+
         document.map = new google.maps.Map(document.getElementById("mapcanvas"));
-        var latlng = new google.maps.LatLng(38.95272, -76.70125);
+        var latlng = new google.maps.LatLng(38.985012633461345, -77.09705424142618);
         var Options = {
-            zoom: 10,
+            zoom: 20,
             center: latlng,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
-        var markers = [];
-        var rectangles = [];
-        var heatmap;
-        var dataPoints = [];
+        
         var map = new google.maps.Map(document.getElementById("mapcanvas"), Options);
         map.addListener('click', function(e) {
           placeMarker(e.latLng, map);
@@ -54,8 +56,13 @@
         
         }
 
-        document.addDataPoint = function(x, y){
+        var addDataPoint = function(x, y){
             dataPoints.push(new google.maps.LatLng(x, y));
+        }
+
+        var clearDataPoints = function(){
+          if(dataPoints.length!=0)
+            dataPoints = [];
         }
 
         var showBox = function(x, y, x2, y2){
@@ -75,32 +82,50 @@
           rectangles[0] = rectangle;
         }
 
-        document.addHeatMapLayer = function(){
+        var showHeatMap = function(){
+          if(rectangles.length==1)
+            rectangles[0].setMap(null);
           heatmap = new google.maps.visualization.HeatmapLayer({
                     data: dataPoints,
                     map: map
             });
         }   
 
-      function toggleHeatmap() {
+       var toggleHeatmap = function() {
         heatmap.setMap(heatmap.getMap() ? null : map);
       }
 
+        var clearAllHeatMaps = function() {
+          if(heatmaps.length!=0)
+          {
+            for (var i = 0; i < heatmaps.length; i++) {
+              heatmaps[i].setMap(null);
+            }
+          }
+        }
+        var drawLine = function (x,y,x1,y1) {
+          var line = [{lat: x, lng: y}, {lat: x1, lng: y1}];
 
-    document.addMarker = function(x, y, name) {
+          var dLine = new google.maps.Polyline({
+          path: line,
+          geodesic: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 1.0,
+          strokeWeight: 2
+        });
+          
+        	dLine.setMap(map);
+        }
+
+    document.addMarker = function(x, y) {
             var marker = new google.maps.Marker({
             position: new google.maps.LatLng(x, y),
             map: map,
             draggable: false,
-            title: name,
             autoPan: true
         });
-
-         google.maps.event.addListener(marker, 'click', function() {
-            openMapInfo(name);
-        });
-
-        }
+      
+    }
     </script>
 </div>
 </body>

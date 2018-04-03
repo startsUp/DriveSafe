@@ -11,8 +11,8 @@ import traffic.Violation;
 
 public class SortList extends Task<Void>{
 	
-   private static ArrayList<Violation> data;
-   private static int flag;
+   private ArrayList<Violation> data;
+   private int flag;
    
    public SortList(ArrayList<Violation> data, int flag) {
 	   this.data = data; //store the reference

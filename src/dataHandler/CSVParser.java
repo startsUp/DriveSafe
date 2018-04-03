@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 import app.MainApp;
 import javafx.concurrent.Task;
-import jdk.nashorn.internal.parser.JSONParser;
 import sorting.HandleSort;
 import traffic.Violation;
 
@@ -114,35 +113,6 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 		return data;
 
 	}
-	public int yo()
-	{
-		return 0;
-	}
-	public String data(String line)
-	{
-		String s ="";
-		int i=0;
-		while(i<line.length())
-		{
-			
-			if(line.charAt(i)!='"')
-				s+=line.charAt(i++);
-			else
-			{
-				i++;
-				while(line.charAt(i)!='"')
-				{
-					if(line.charAt(i)!=',')
-						s+=line.charAt(i++);
-					else
-						i++;
-				}
-
-				i++;
-			}
-
-		}
-		return s;
-	}
+	
 
 }
