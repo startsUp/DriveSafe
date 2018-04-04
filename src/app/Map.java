@@ -3,9 +3,11 @@ package app;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 
 import dataHandler.BoundBox;
 import dataHandler.ParseJSON;
+import graphing.DijkstraUndirectedSP;
 import graphing.Edge;
 import graphing.Graph;
 import graphing.Vertex;
@@ -15,12 +17,14 @@ import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
@@ -30,22 +34,26 @@ public class Map {
 
 
 	private double bounds[];
+	private static boolean  graphMode;
 
 
-	public BorderPane getGooogleMap(ArrayList<Violation> data){
+	public GridPane getGooogleMap(ArrayList<Violation> data){
 
-
+		graphMode = false;
 		this.bounds = new double[4];
-		BorderPane mapPane = new BorderPane();
+		GridPane mapPane = new GridPane();
 
-		long st = System.currentTimeMillis();
-		
+
+
 		HashMap<String, Integer> trafficData = hashData(data);
 		ParseJSON parse = new ParseJSON();
-		Vertex[] graph = parse.getVertices();
-		//Graph.addViolationWeight(graph,  trafficData);
+		Graph graph = new Graph(parse.getVertices());
+
+		Graph.addViolationWeight(graph,  trafficData);
+		long st = System.currentTimeMillis();
 		
 
+		
 
 		WebView webView = new WebView();
 		WebEngine webEngine = webView.getEngine();
@@ -102,8 +110,9 @@ public class Map {
 
 
 		Slider slider = new Slider();
+		slider.setMaxHeight(100);
+		slider.setPrefWidth(300);
 		slider.setShowTickMarks(true);
-		slider.setShowTickLabels(true);
 
 
 
@@ -112,99 +121,167 @@ public class Map {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> obs, Boolean wasChanging, Boolean isNowChanging) {
 				if (!isNowChanging) {
-					double lat = jsObj.getLat();
-					double lng = jsObj.getLng();
+					double lat = jsObj.getLat(0);
+					double lng = jsObj.getLng(0);
 					double lat1 = lat-(0.001*slider.getValue());
 					double lng1 = lng-(0.001*slider.getValue());
 					double lat2 = lat+(0.001*slider.getValue());
 					double lng2 = lng+(0.001*slider.getValue());
 					setBounds(lat1, lng1, lat2, lng2);
-
-					System.out.println("Changed: " + jsObj.getLat() + jsObj.getLat());
-					webEngine.executeScript("" +
-							"window.x1 = " +  (lat1)  + ";" +
-							"window.y1 = " +  (lng1)  + ";" +
-							"window.x2 = " +  (lat2)  + ";" +
-							"window.y2 = " +  (lng2)  + ";" +
-							"showBox(window.x1, window.y1, window.x2, window.y2);"
-							);
+					if(!graphMode)
+					{
+						
+						webEngine.executeScript("" +
+								"window.x1 = " +  (lat1)  + ";" +
+								"window.y1 = " +  (lng1)  + ";" +
+								"window.x2 = " +  (lat2)  + ";" +
+								"window.y2 = " +  (lng2)  + ";" +
+								"showBox(window.x1, window.y1, window.x2, window.y2);"
+								);
+					}
+					
 				}
 			}
 		});
 
-	
+		Button toggleGraphMode = new Button("Mode : HeatMap");
+		toggleGraphMode.setTooltip(new Tooltip("Click to switch modes"));
+		
+		toggleGraphMode.setOnAction(e->{
+			if(toggleGraphMode.getText().equals("Mode : HeatMap"))
+				toggleGraphMode.setText("Mode : PathFind");
+			else
+				toggleGraphMode.setText("Mode : HeatMap");
+			
+			graphMode=(!graphMode);
+			jsObj.emptyList();
+			webEngine.executeScript("toggleGraphMode();");
+		});
+		
 		//slider.setPrefSize(100, 200);
-		slider.setMaxWidth(200);
+		//slider.setMaxWidth(200);
 
 		GridPane controls = new GridPane();
-		controls.setPrefHeight(100);
+		controls.setPadding(new Insets(10,0,0,10));
 		controls.add(slider, 2, 0);
+		controls.add(toggleGraphMode, 0 , 0);
 		
+		Button find = new Button("find");
 		
-		
+		find.setOnAction(e->{
+			int startLoc = graph.getVertexID(Double.toString(jsObj.getLat(0)), Double.toString(jsObj.getLng(0)));
+			int endLoc = graph.getVertexID(Double.toString(jsObj.getLat(1)), Double.toString(jsObj.getLng(1)));
+			if(startLoc == -1 || endLoc == -1)
+			{
+				webEngine.executeScript("clearMap();");
+			}
+			DijkstraUndirectedSP sp = new DijkstraUndirectedSP(graph, startLoc);
+			webEngine.executeScript("clearPathPoints();");
+			for(Edge edge: sp.pathTo(endLoc))
+			{
+				webEngine.executeScript("" +
+						"window.lat = " +  graph.getVertex(edge.getI()).getLa() /*loc.lat*/ + ";" +
+						"window.lon = " +  graph.getVertex(edge.getI()).getLo() /*loc.lon*/ + ";"+
+						"addPathPoints(window.lat, window.lon);"
+						);
+			}
+			webEngine.executeScript("showLine();");
+			
+		});
+		controls.add(find, 3, 0);
+
+
+
 		Button plotGraphData = new Button("plot");
 		controls.add(plotGraphData, 1, 0);
 		plotGraphData.setOnAction(e->{
-			BoundBox b = new BoundBox();
-			ArrayList<Violation> t = b.Bounding(data, bounds[0], bounds[2], bounds[1], bounds[3]);
-			webEngine.executeScript("clearDataPoints();");
-			for(Violation v: t) {
-				webEngine.executeScript("" +
-						"window.lat = " + v.getLatlong()[0] /*loc.lat*/ + ";" +
-						"window.lon = " + v.getLatlong()[1]/*loc.lon*/ + ";"+
-						"addDataPoint(window.lat, window.lon);"
-						);
+			if(bounds[0]!=0) {
+				BoundBox b = new BoundBox();
+				ArrayList<Violation> t = b.Bounding(data, bounds[0], bounds[2], bounds[1], bounds[3]);
+				webEngine.executeScript("clearDataPoints();");
 			}
-			webEngine.executeScript("showHeatMap();");
-			ParseJSON p = new ParseJSON();
-			int i =0;
-			for(Vertex v: graph)
-			{
-				double lat = v.getLa();
-				double lng = v.getLo();
-
-				if(i>10000) break;
-				webEngine.executeScript("" +
-						"window.lat = " + lat /*loc.lat*/ + ";" +
-						"window.lon = " + lng /*loc.lon*/ + ";"+
-						"document.addMarker(window.lat, window.lon);"
-						);
-
-				for(Edge edge: v.getE()) {
-
-					double lat1 = graph[edge.getI()].getLa();
-					double lng1 = graph[edge.getI()].getLo();
-
-					System.out.println(lat + " " + lng + " " + lat1 + " " + lng1 + " " + edge.getW());
-					try {
-						webEngine.executeScript("" +
-								"window.lat  = " + lat /*loc.lat*/ + ";" +
-								"window.lon = " +  lng/*loc.lon*/ + ";"+
-								"window.lat1 = " + lat1/*loc.lon*/ + ";"+
-								"window.lat2 = " + lng1/*loc.lon*/ + ";"+
-								"drawLine(window.lat, window.lon, window.lat1, window.lon1);"
-								);
-					} catch (Exception e2) {
-						// TODO: handle exception
-					}
-
-				}
-				i++;
-			}
-
+			
+//			for(Violation v: t) {
+//				webEngine.executeScript("" +
+//						"window.lat = " + v.getLatlong()[0] /*loc.lat*/ + ";" +
+//						"window.lon = " + v.getLatlong()[1]/*loc.lon*/ + ";"+
+//						"addDataPoint(window.lat, window.lon);"
+//						);
+//			}
+			
+//			webEngine.executeScript("showHeatMap();");
+//			webEngine.executeScript("" +
+//					"window.lat = " + graph.getVertex(0).getLa()/*loc.lat*/ + ";" +
+//					"window.lon = " + graph.getVertex(0).getLo()/*loc.lon*/ + ";"+
+//					"addPathPoints(window.lat, window.lon);"
+//					);
+//			
+			
 		});
+		
+		
+//			int i =0;
+//			for(Vertex v: graph)
+//			{
+//				double lat = v.getLa();
+//				double lng = v.getLo();
+//
+//				if(i>10000) break;
+//				webEngine.executeScript("" +
+//						"window.lat = " + lat /*loc.lat*/ + ";" +
+//						"window.lon = " + lng /*loc.lon*/ + ";"+
+//						"document.addMarker(window.lat, window.lon);"
+//						);
+//
+//				for(Edge edge: v.getE()) {
+//
+//					double lat1 = graph[edge.getI()].getLa();
+//					double lng1 = graph[edge.getI()].getLo();
+//
+//					System.out.println(lat + " " + lng + " " + lat1 + " " + lng1 + " " + edge.getW());
+//					try {
+//						webEngine.executeScript("" +
+//								"window.lat  = " + lat /*loc.lat*/ + ";" +
+//								"window.lon = " +  lng/*loc.lon*/ + ";"+
+//								"window.lat1 = " + lat1/*loc.lon*/ + ";"+
+//								"window.lat2 = " + lng1/*loc.lon*/ + ";"+
+//								"drawLine(window.lat, window.lon, window.lat1, window.lon1);"
+//								);
+//					} catch (Exception e2) {
+//						// TODO: handle exception
+//					}
+//
+//				}
+//				i++;
+
+		
+		//plot path
+//		for(Edge edge: sp.pathTo(1349))
+//		{
+//			webEngine.executeScript("" +
+//					"window.lat = " +  graph.getVertex(edge.getI()).getLa() /*loc.lat*/ + ";" +
+//					"window.lon = " +  graph.getVertex(edge.getI()).getLo() /*loc.lon*/ + ";"+
+//					"addPathPoints(window.lat, window.lon);"
+//					);
+//		}
+//		webEngine.executeScript("showLine();");
+
+		
+		controls.setPrefHeight(50);
+		
+		GridPane.setHgrow(webView, Priority.ALWAYS);
+		GridPane.setVgrow(webView, Priority.ALWAYS);
+		mapPane.add(controls, 0, 0);
+		mapPane.add(webView, 0, 1);
+		mapPane.setPadding(new Insets(0));
+		mapPane.setStyle("-fx-background-color: #242424");
 
 
-
-
-		mapPane.setTop(controls);
-		mapPane.setCenter(webView);
-		webView.toFront();
 		//		StackPane sPane = new StackPane();
 		//		StackPane.setAlignment(g, Pos.TOP_LEFT);
 		//		sPane.getChildren().addAll(webView, g);
-
-
+		//		Rectangle2D bounds = Screen.getPrimary().getBounds();
+		//		mapPane.setPrefSize(bounds.getWidth(), bounds.getHeight());
 		//slider.toFront();
 		return mapPane;
 
@@ -223,13 +300,13 @@ public class Map {
 			//key = lat+long, accurate upto 3 decimal points
 			key = latLng[0].trim().substring(0, Math.min(latLng[0].length(), 6)) + latLng[1].trim().substring(0, Math.min(latLng[1].length()-1, 7));
 			//System.out.println(key);
-			
+
 			if(latlngViolations.containsKey(key))
 				latlngViolations.put(key, latlngViolations.get(key)+1);
 			else
 				latlngViolations.put(key, 1);
 		}
-		return null;
+		return latlngViolations;
 	}
 
 

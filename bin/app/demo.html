@@ -2,8 +2,13 @@
 <html>
 <head>
     <script src="http://maps.google.com/maps/api/js?sensor=false&libraries=visualization"></script>
-    <style>#mapcanvas { height: 885px; width: 100%}
-     body { margin:0;}
+    <style>#mapcanvas { height: 100%; width: 100%}
+    body, html {
+      margin:0;
+      height: 100%;
+      width: 100%;
+    }
+}
     </style>
 </head>
 <body>
@@ -14,11 +19,15 @@
         var rectangles = [];
         var heatmaps = [];
         var dataPoints = [];
+        var pathPoints = [];
+        var lines = [];
 
-        document.map = new google.maps.Map(document.getElementById("mapcanvas"));
+        var graphMode = false;
+
+        
         var latlng = new google.maps.LatLng(38.985012633461345, -77.09705424142618);
         var Options = {
-            zoom: 20,
+            zoom: 15,
             center: latlng,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
@@ -26,61 +35,152 @@
         var map = new google.maps.Map(document.getElementById("mapcanvas"), Options);
         map.addListener('click', function(e) {
           placeMarker(e.latLng, map);
-          upcall(e.latLng);
+          app.changeLatLong(e.latLng.toString());
         });
        
 
         var placeMarker = function(latLng, map) {
+          updateOld();
           var marker = new google.maps.Marker({
             position: latLng,
             animation: google.maps.Animation.DROP,
             map: map
           });
           
-          console.log(markers);
-          updateOld(marker, null);
+         // console.log(markers);
+         markers.push(marker);
+
         }
 
-        var updateOld = function(marker, map) {
-            if (markers.length!=0)
+        var updateOld = function() {
+          
+            if (markers.length==1 && !graphMode)
               {
-                markers[0].setMap(map);
-                markers[0] = marker;
+                markers[0].setMap(null);
+                markers[0]=null;
               }
-            else
-                markers.push(marker); 
+
+            if (markers.length>=2 && graphMode)
+            {
+              for (i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+                markers[i] = null;
+              }
+            }
+            markers =[];
         }
 
-        var upcall = function(latlng){
-          app.changeLatLong(latlng.toString());
-        
+        var toggleGraphMode = function(){
+          graphMode = (!graphMode);
+          clearMap();
         }
+  
+        var clearMap = function(){
+          if(markers.length!=0)
+          {
+            for (var i = 0; i < markers.length; i++) 
+            {
+              markers[i].setMap(null);   
+            }
+            markers = [];
+          }
+          if(heatmaps.length!=0)
+          {
+            for (var i = 0; i < heatmaps.length; i++) 
+            {
+              heatmaps[i].setMap(null);   
+            }
+             heatmaps = [];
+          }
+          if(rectangles.length!=0)
+          {
+            for (var i = 0; i < rectangles.length; i++) 
+            {
+              rectangles[i].setMap(null);   
+            }
+             rectangles = [];
+          }
+          clearPathPoints();
+          pathPoints = [];
+          
+            
+        }
+        var addPathPoints = function(x, y){
+          pathPoints.push({lat: x, lng: y});
+        }
+            
 
+      var clearPathPoints = function(){
+          if(pathPoints.length!=0)
+           {
+            pathPoints = [];
+           }
+           if(lines.length!=0)
+           {
+            lines[0].setMap(null);
+            lines[0] = null;
+            lines = [];
+           }            
+
+        }
+        var showLine = function(){
+          if(pathPoints.length!=0)
+          {
+            var dLine = new google.maps.Polyline({
+            path: pathPoints,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        });
+          
+          dLine.setMap(map);
+          lines.push(dLine);
+          }
+          pathPoints = [];
+        }
         var addDataPoint = function(x, y){
             dataPoints.push(new google.maps.LatLng(x, y));
         }
 
         var clearDataPoints = function(){
           if(dataPoints.length!=0)
+           {
             dataPoints = [];
+           }
+           if(heatmaps.length!=0)
+           {
+            heatmaps[0].setMap(null);
+            heatmaps = [];
+           }            
+
         }
+        
 
         var showBox = function(x, y, x2, y2){
-          if(rectangles.length==1)
+          if(markers.length!=0)
+          {
+            map.panTo(markers[0].getPosition());
+            
+            if(rectangles.length==1)
             rectangles[0].setMap(null);
 
           var rectangle = new google.maps.Rectangle({
           strokeColor: '#FF0000',
           strokeOpacity: 0.8,
           strokeWeight: 2,
+          clickable: false,
           fillColor: '#FF0000',
           fillOpacity: 0.2,
           map: map,
           bounds: new google.maps.LatLngBounds(new google.maps.LatLng(x,y), 
                   new google.maps.LatLng(x2, y2)),
-        });
+          });
           rectangles[0] = rectangle;
+          map.fitBounds(rectangle.getBounds());
+          
         }
+      }
 
         var showHeatMap = function(){
           if(rectangles.length==1)
@@ -103,29 +203,8 @@
             }
           }
         }
-        var drawLine = function (x,y,x1,y1) {
-          var line = [{lat: x, lng: y}, {lat: x1, lng: y1}];
+        
 
-          var dLine = new google.maps.Polyline({
-          path: line,
-          geodesic: true,
-          strokeColor: '#FF0000',
-          strokeOpacity: 1.0,
-          strokeWeight: 2
-        });
-          
-        	dLine.setMap(map);
-        }
-
-    document.addMarker = function(x, y) {
-            var marker = new google.maps.Marker({
-            position: new google.maps.LatLng(x, y),
-            map: map,
-            draggable: false,
-            autoPan: true
-        });
-      
-    }
     </script>
 </div>
 </body>

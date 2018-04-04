@@ -1,37 +1,43 @@
 package app;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class JavaScriptUpCall {
 
-	protected double latLng[];
+	protected List<double[]> latLng;
 	
 	public JavaScriptUpCall() {
-		this.latLng = new double[2];
+		this.latLng = new ArrayList<>();
 	}
-	public void changeLatLong(String name)	
+	public void changeLatLong(String ltlng)	
 	{
 		
-		System.out.println(name);
+		System.out.println(ltlng);
 
 		try {
-			String[] latlng = name.replaceAll("[()]", "").split(",");
-			this.latLng[0] = Double.parseDouble(latlng[0]);
-			this.latLng[1] = Double.parseDouble(latlng[1]);
+			String[] latlng = ltlng.replaceAll("[()]", "").split(",");
+			this.latLng.add(new double[] {Double.parseDouble(latlng[0]),Double.parseDouble(latlng[1])});
 		} catch (Exception e) {
 			System.err.println(e);
 		}
 		
-		System.out.println(this.latLng[0] + " " + this.latLng[1]);
 		
 	}
 	
-	public double getLat()
+	public double getLat(int i)
 	{
-		return this.latLng[0];
+		return this.latLng.get(i)[0];
 	}
 	
-	public double getLng()
+	public double getLng(int i)
 	{
-		return this.latLng[1];
+		return this.latLng.get(i)[1];
+	}
+	
+	public void emptyList()
+	{
+		this.latLng.clear();
 	}
 	
 	
