@@ -14,7 +14,7 @@ public class JavaScriptUpCall {
 	{
 		
 		System.out.println(ltlng);
-
+		
 		try {
 			String[] latlng = ltlng.replaceAll("[()]", "").split(",");
 			this.latLng.add(new double[] {Double.parseDouble(latlng[0]),Double.parseDouble(latlng[1])});
@@ -29,12 +29,22 @@ public class JavaScriptUpCall {
 	{
 		return this.latLng.get(i)[0];
 	}
-	
+	public double getLastLat()
+	{
+		return this.latLng.get(latLng.size()-1)[0];
+	}
+	public double getLastLng()
+	{
+		return this.latLng.get(latLng.size()-1)[1];
+	}
 	public double getLng(int i)
 	{
 		return this.latLng.get(i)[1];
 	}
-	
+	public int length()
+	{
+		return this.latLng.size();
+	}
 	public void emptyList()
 	{
 		this.latLng.clear();

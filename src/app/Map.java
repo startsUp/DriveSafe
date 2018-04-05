@@ -16,7 +16,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
@@ -121,8 +123,10 @@ public class Map {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> obs, Boolean wasChanging, Boolean isNowChanging) {
 				if (!isNowChanging) {
-					double lat = jsObj.getLat(0);
-					double lng = jsObj.getLng(0);
+					double lat = jsObj.getLastLat();
+					double lng = jsObj.getLastLng();
+					if(jsObj.length()>=2) jsObj.emptyList(); 
+					
 					double lat1 = lat-(0.001*slider.getValue());
 					double lng1 = lng-(0.001*slider.getValue());
 					double lat2 = lat+(0.001*slider.getValue());
@@ -147,27 +151,22 @@ public class Map {
 		Button toggleGraphMode = new Button("Mode : HeatMap");
 		toggleGraphMode.setTooltip(new Tooltip("Click to switch modes"));
 		
-		toggleGraphMode.setOnAction(e->{
-			if(toggleGraphMode.getText().equals("Mode : HeatMap"))
-				toggleGraphMode.setText("Mode : PathFind");
-			else
-				toggleGraphMode.setText("Mode : HeatMap");
-			
-			graphMode=(!graphMode);
-			jsObj.emptyList();
-			webEngine.executeScript("toggleGraphMode();");
-		});
+		
 		
 		//slider.setPrefSize(100, 200);
 		//slider.setMaxWidth(200);
 
 		GridPane controls = new GridPane();
-		controls.setPadding(new Insets(10,0,0,10));
+		controls.setPadding(new Insets(10,20,10,10));
+		
 		controls.add(slider, 2, 0);
 		controls.add(toggleGraphMode, 0 , 0);
 		
-		Button find = new Button("find");
 		
+		
+		Button find = new Button("find");
+	
+		GridPane.setHalignment(find, HPos.RIGHT);
 		find.setOnAction(e->{
 			int startLoc = graph.getVertexID(Double.toString(jsObj.getLat(0)), Double.toString(jsObj.getLng(0)));
 			int endLoc = graph.getVertexID(Double.toString(jsObj.getLat(1)), Double.toString(jsObj.getLng(1)));
@@ -186,36 +185,38 @@ public class Map {
 						);
 			}
 			webEngine.executeScript("showLine();");
+			jsObj.emptyList();
 			
 		});
-		controls.add(find, 3, 0);
+		//controls.add(find, 3, 0);
 
 
 
-		Button plotGraphData = new Button("plot");
+		Button plotGraphData = new Button("Show HeatMap");
 		controls.add(plotGraphData, 1, 0);
+		
 		plotGraphData.setOnAction(e->{
+			ArrayList<Violation> t = null; //fix
 			if(bounds[0]!=0) {
 				BoundBox b = new BoundBox();
-				ArrayList<Violation> t = b.Bounding(data, bounds[0], bounds[2], bounds[1], bounds[3]);
+				t = b.Bounding(data, bounds[0], bounds[2], bounds[1], bounds[3]);
 				webEngine.executeScript("clearDataPoints();");
 			}
 			
-//			for(Violation v: t) {
-//				webEngine.executeScript("" +
-//						"window.lat = " + v.getLatlong()[0] /*loc.lat*/ + ";" +
-//						"window.lon = " + v.getLatlong()[1]/*loc.lon*/ + ";"+
-//						"addDataPoint(window.lat, window.lon);"
-//						);
-//			}
+			for(Violation v: t) {
+				webEngine.executeScript("" +
+						"window.lat = " + v.getLatlong()[0] /*loc.lat*/ + ";" +
+						"window.lon = " + v.getLatlong()[1]/*loc.lon*/ + ";"+
+						"addDataPoint(window.lat, window.lon);"
+						);			}
 			
-//			webEngine.executeScript("showHeatMap();");
-//			webEngine.executeScript("" +
-//					"window.lat = " + graph.getVertex(0).getLa()/*loc.lat*/ + ";" +
-//					"window.lon = " + graph.getVertex(0).getLo()/*loc.lon*/ + ";"+
-//					"addPathPoints(window.lat, window.lon);"
-//					);
-//			
+			webEngine.executeScript("showHeatMap();");
+			webEngine.executeScript("" +
+					"window.lat = " + graph.getVertex(0).getLa()/*loc.lat*/ + ";" +
+					"window.lon = " + graph.getVertex(0).getLo()/*loc.lon*/ + ";"+
+					"addPathPoints(window.lat, window.lon);"
+					);
+			
 			
 		});
 		
@@ -265,8 +266,32 @@ public class Map {
 //					);
 //		}
 //		webEngine.executeScript("showLine();");
-
-		
+		GridPane.setMargin(find, new Insets(0,0,0,20));
+		GridPane.setMargin(plotGraphData, new Insets(0,0,0,20));
+		GridPane.setMargin(slider, new Insets(0,5,0,1300));
+		toggleGraphMode.setOnAction(e->{
+			if(!graphMode)
+				{
+				toggleGraphMode.setText("Mode : PathFind");
+				controls.getChildren().remove(slider);
+				controls.getChildren().remove(plotGraphData);
+				controls.add(find, 1, 0);
+				}
+			else
+			{
+				toggleGraphMode.setText("Mode : HeatMap");
+				controls.add(slider, 2, 0);
+				controls.add(plotGraphData, 1, 0);
+				controls.getChildren().remove(find);
+				
+			}
+				
+			
+			graphMode=(!graphMode);
+			jsObj.emptyList();
+			webEngine.executeScript("toggleGraphMode();");
+			
+		});
 		controls.setPrefHeight(50);
 		
 		GridPane.setHgrow(webView, Priority.ALWAYS);
