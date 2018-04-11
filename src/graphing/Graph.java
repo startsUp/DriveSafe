@@ -8,7 +8,6 @@ public class Graph {
 
 	private Vertex[] vertices;
 	private HashMap<String, List<Integer>> map;
-	private String[] keys;
 
 	//	public List<Vertex> getGraph() {
 	//		return graph;
@@ -17,7 +16,6 @@ public class Graph {
 	public Graph(Vertex[] vertices) {
 		this.vertices = vertices;
 		map = new HashMap<>();
-		keys = new String[V()];
 		fillMap(vertices);
 	}
 
@@ -58,7 +56,7 @@ public class Graph {
 	public static void addViolationWeight(Graph graph, HashMap<String, Integer> weights)
 
 	{
-		int found= 0;
+
 		HashMap<String, Boolean> updatedEdges = new HashMap<>();
 		for(int i=0; i<graph.V(); i++)
 		{
@@ -96,7 +94,7 @@ public class Graph {
 
 
 		}
-		System.out.println("found : " + found);
+		
 	}
 
 	private static int updateWeight(Edge e, int violationCount) {

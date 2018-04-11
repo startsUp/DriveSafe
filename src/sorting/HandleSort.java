@@ -1,18 +1,26 @@
 package sorting;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Handles the dataset status file. It checks if the dataset has already been sorted or not. 
+ * @author shardool
+ *
+ */
 public class HandleSort {
 	
+	
+	/**
+	 * Reads the dataset status file to check the sorted status
+	 * @param statusFile
+	 * @return true if dataset sorted, false otherwise
+	 */
 	public static boolean isDataSorted(String statusFile) {
 		FileReader file;
 		
@@ -32,6 +40,11 @@ public class HandleSort {
 		return false;
 	}
 	
+	/**
+	 * Reads the status from the file and returns the string status
+	 * @param statusFile
+	 * @return status in String format
+	 */
 	public static String getCurrentStatus(String statusFile) {
 		FileReader file;
 		
@@ -50,6 +63,11 @@ public class HandleSort {
 		return "";
 	}
 
+	/**
+	 * Writes back the status given 
+	 * @param datasetStatus updated status
+	 * @param isSorted 
+	 */
 	public static void updateStatus(String datasetStatus, boolean isSorted) {
 		List<String> lines = new ArrayList<>();
 		String lstUpdated = getCurrentStatus(datasetStatus).split(",")[1];
@@ -61,7 +79,6 @@ public class HandleSort {
 		try {
 			Files.write(Paths.get(datasetStatus), lines, Charset.forName("UTF-8"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

@@ -3,23 +3,19 @@ package app;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Stack;
 
 import dataHandler.BoundBox;
 import dataHandler.ParseJSON;
 import graphing.DijkstraUndirectedSP;
 import graphing.Edge;
 import graphing.Graph;
-import graphing.Vertex;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
@@ -27,18 +23,35 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import netscape.javascript.JSObject;
 import traffic.Violation;
+
+/**
+ * The Map class provides a google map and the basic control of the application, i.e 
+ * it handles user requests and updates the application appropriately.
+ * @author shardool
+ *
+ */
 public class Map {
 
 
 	private double bounds[];
-	private static boolean  graphMode;
+	private static boolean graphMode;
 
-
+/**
+ * This method returns the main view of the application. The majority of the view is a google map view embedded using
+ * javafx's webview class. The google map is obtained from googlemap.html and map.js, which together provide the
+ * interactive ability for users to control what they see on the map. 
+ * The view ,in addition to google maps, also provides control buttons for switching between modes.
+ * @param data The parsed data of violation objects
+ * @return The GridPane view of the google map 
+ */
 	public GridPane getGooogleMap(ArrayList<Violation> data){
 
 		graphMode = false;
@@ -46,23 +59,18 @@ public class Map {
 		GridPane mapPane = new GridPane();
 
 
-
 		HashMap<String, Integer> trafficData = hashData(data);
 		ParseJSON parse = new ParseJSON();
 		Graph graph = new Graph(parse.getVertices());
 
 		Graph.addViolationWeight(graph,  trafficData);
-		long st = System.currentTimeMillis();
-		
-
 		
 
 		WebView webView = new WebView();
 		WebEngine webEngine = webView.getEngine();
 
 
-		final URL googleMap = getClass().getResource("demo.html");
-
+		final URL googleMap = getClass().getResource("googlemap.html");
 
 
 		ProgressBar prog = new ProgressBar(0);
@@ -72,33 +80,16 @@ public class Map {
 		prog.progressProperty().bind(webEngine.getLoadWorker().progressProperty());
 		webEngine.load(googleMap.toExternalForm());
 
-
-
-		webEngine.setOnAlert(new EventHandler<WebEvent<String>>() {
-			@Override
-			public void handle(WebEvent<String> e) {
-				System.out.println(e.toString());
-			}
-		});
-
-
-		webEngine.setOnStatusChanged(e->{
-			System.out.println(e);
-		});
+	
 
 
 		webEngine.setJavaScriptEnabled(true);
-		//		reload.setOnAction(e-> webEngine.reload());
-		//		rightB.getChildren().addAll(reload, add);
-		//JSObject win = (JSObject) webEngine.executeScript("window");
 		JavaScriptUpCall jsObj = new JavaScriptUpCall();
-		//		win.setMember("app", jsObj);
 
 		webEngine.getLoadWorker().stateProperty().addListener(
 				new ChangeListener<Worker.State>() {
 					public void changed(ObservableValue<? extends State> ov, Worker.State oldState, Worker.State newState) {
 						if (newState == Worker.State.SUCCEEDED) {                
-							System.out.println(0);
 							JSObject win = (JSObject) webEngine.executeScript("window");
 							win.setMember("app",  jsObj);
 						}
@@ -118,7 +109,7 @@ public class Map {
 
 
 
-
+		//change bounding box when slider is dragged
 		slider.valueChangingProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> obs, Boolean wasChanging, Boolean isNowChanging) {
@@ -148,13 +139,12 @@ public class Map {
 			}
 		});
 
+		
 		Button toggleGraphMode = new Button("Mode : HeatMap");
 		toggleGraphMode.setTooltip(new Tooltip("Click to switch modes"));
 		
 		
 		
-		//slider.setPrefSize(100, 200);
-		//slider.setMaxWidth(200);
 
 		GridPane controls = new GridPane();
 		controls.setPadding(new Insets(10,20,10,10));
@@ -172,7 +162,18 @@ public class Map {
 			int endLoc = graph.getVertexID(Double.toString(jsObj.getLat(1)), Double.toString(jsObj.getLng(1)));
 			if(startLoc == -1 || endLoc == -1)
 			{
+				//reset google map
 				webEngine.executeScript("clearMap();");
+				webEngine.executeScript("toggleGraphMode();");
+				webEngine.executeScript("toggleGraphMode();");
+				jsObj.emptyList();
+				
+				//show error message if path not found
+				Stage err = new Stage();
+				err.initModality(Modality.APPLICATION_MODAL);
+				err.setScene(new Scene(new Button("Path not Found")));
+				err.show();
+				return;
 			}
 			DijkstraUndirectedSP sp = new DijkstraUndirectedSP(graph, startLoc);
 			webEngine.executeScript("clearPathPoints();");
@@ -188,14 +189,14 @@ public class Map {
 			jsObj.emptyList();
 			
 		});
-		//controls.add(find, 3, 0);
 
 
 
-		Button plotGraphData = new Button("Show HeatMap");
-		controls.add(plotGraphData, 1, 0);
+
+		Button showHeatMap = new Button("Show HeatMap");
+		controls.add(showHeatMap, 1, 0);
 		
-		plotGraphData.setOnAction(e->{
+		showHeatMap.setOnAction(e->{
 			ArrayList<Violation> t = null; //fix
 			if(bounds[0]!=0) {
 				BoundBox b = new BoundBox();
@@ -220,68 +221,46 @@ public class Map {
 			
 		});
 		
+		//add help button if user need to know how to use the app
+		Button help = new Button("Help");
+		help.setOnAction(e->{
+			Stage helpS = new Stage();
+			Text helpInfo;
+			
+			if(graphMode)
+			helpInfo = new Text("Click on the map to drop two markers representating the starting location"
+					+ "and the destination location. Click find Path to find the path between these markers");
+			else
+				helpInfo = new Text("Click on the map to drop a marker and adjust the bounding box."
+						+ "Click on show heatmap button to show the rates of violations in this area.");
+			helpInfo.setWrappingWidth(200);
+			helpInfo.setTextAlignment(TextAlignment.CENTER);
+			helpS.setScene(new Scene(new HBox(helpInfo)));
+			
+			helpS.show();
+			helpS.initModality(Modality.WINDOW_MODAL);
+		});
 		
-//			int i =0;
-//			for(Vertex v: graph)
-//			{
-//				double lat = v.getLa();
-//				double lng = v.getLo();
-//
-//				if(i>10000) break;
-//				webEngine.executeScript("" +
-//						"window.lat = " + lat /*loc.lat*/ + ";" +
-//						"window.lon = " + lng /*loc.lon*/ + ";"+
-//						"document.addMarker(window.lat, window.lon);"
-//						);
-//
-//				for(Edge edge: v.getE()) {
-//
-//					double lat1 = graph[edge.getI()].getLa();
-//					double lng1 = graph[edge.getI()].getLo();
-//
-//					System.out.println(lat + " " + lng + " " + lat1 + " " + lng1 + " " + edge.getW());
-//					try {
-//						webEngine.executeScript("" +
-//								"window.lat  = " + lat /*loc.lat*/ + ";" +
-//								"window.lon = " +  lng/*loc.lon*/ + ";"+
-//								"window.lat1 = " + lat1/*loc.lon*/ + ";"+
-//								"window.lat2 = " + lng1/*loc.lon*/ + ";"+
-//								"drawLine(window.lat, window.lon, window.lat1, window.lon1);"
-//								);
-//					} catch (Exception e2) {
-//						// TODO: handle exception
-//					}
-//
-//				}
-//				i++;
-
-		
-		//plot path
-//		for(Edge edge: sp.pathTo(1349))
-//		{
-//			webEngine.executeScript("" +
-//					"window.lat = " +  graph.getVertex(edge.getI()).getLa() /*loc.lat*/ + ";" +
-//					"window.lon = " +  graph.getVertex(edge.getI()).getLo() /*loc.lon*/ + ";"+
-//					"addPathPoints(window.lat, window.lon);"
-//					);
-//		}
-//		webEngine.executeScript("showLine();");
+		controls.add(help,3,0);
+		GridPane.setMargin(help, new Insets(0,0,0,30));
 		GridPane.setMargin(find, new Insets(0,0,0,20));
-		GridPane.setMargin(plotGraphData, new Insets(0,0,0,20));
-		GridPane.setMargin(slider, new Insets(0,5,0,1300));
+		GridPane.setMargin(showHeatMap, new Insets(0,0,0,20));
+		GridPane.setMargin(slider, new Insets(0,5,0,1230));
+		
+		//toggle between modes
 		toggleGraphMode.setOnAction(e->{
 			if(!graphMode)
 				{
 				toggleGraphMode.setText("Mode : PathFind");
 				controls.getChildren().remove(slider);
-				controls.getChildren().remove(plotGraphData);
+				controls.getChildren().remove(showHeatMap);
 				controls.add(find, 1, 0);
 				}
 			else
 			{
 				toggleGraphMode.setText("Mode : HeatMap");
 				controls.add(slider, 2, 0);
-				controls.add(plotGraphData, 1, 0);
+				controls.add(showHeatMap, 1, 0);
 				controls.getChildren().remove(find);
 				
 			}
@@ -302,30 +281,25 @@ public class Map {
 		mapPane.setStyle("-fx-background-color: #242424");
 
 
-		//		StackPane sPane = new StackPane();
-		//		StackPane.setAlignment(g, Pos.TOP_LEFT);
-		//		sPane.getChildren().addAll(webView, g);
-		//		Rectangle2D bounds = Screen.getPrimary().getBounds();
-		//		mapPane.setPrefSize(bounds.getWidth(), bounds.getHeight());
-		//slider.toFront();
 		return mapPane;
 
 	}
 
 
 
-
+/**
+ * Helper method that stores the RATE of violation based on the latlng (upto 3 decimal points).
+ * This helps the application to access the rates near an area in constant time
+ * @param data
+ * @return HashMap<String, Integer> count of violations in the latlng specified by the string. 
+ */
 	private HashMap<String, Integer> hashData(ArrayList<Violation> data) {
-		// TODO Auto-generated method stub
 		HashMap<String, Integer> latlngViolations = new HashMap<>();
 		for(Violation v: data)
 		{ 
 			String[] latLng = v.getLatlong();
 			String key= "";
-			//key = lat+long, accurate upto 3 decimal points
 			key = latLng[0].trim().substring(0, Math.min(latLng[0].length(), 6)) + latLng[1].trim().substring(0, Math.min(latLng[1].length()-1, 7));
-			//System.out.println(key);
-
 			if(latlngViolations.containsKey(key))
 				latlngViolations.put(key, latlngViolations.get(key)+1);
 			else
@@ -336,8 +310,14 @@ public class Map {
 
 
 
-
-	public void setBounds(double lat1, double lng1, double lat2, double lng2)
+/**
+ * Stores the bounds for the bounding box 
+ * @param lat1 left corner latitude
+ * @param lng1 left corner longitude
+ * @param lat2 right corner latitude
+ * @param lng2 right corner longitude
+ */
+	private void setBounds(double lat1, double lng1, double lat2, double lng2)
 	{
 		this.bounds[0] = lat1;
 		this.bounds[1] = lng1;
@@ -346,12 +326,7 @@ public class Map {
 	}
 
 
-	public HBox getControls()
-	{
-		HBox buttons = new HBox();
-		return buttons;
-
-	}
+	
 
 
 }

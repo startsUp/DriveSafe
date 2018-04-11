@@ -1,6 +1,7 @@
 /**
+ * Class for sorting violation objects based on lat/lng
  * @author Vaibhav Chadha and Usman Irfan
- * @version Eclipse Oxygen
+ * 
  */
 package sorting;
 
@@ -121,6 +122,7 @@ public class SortList extends Task<Void>{
 		exchange(a, lo, j);
 		return j;
 	}
+	
 	public static boolean isSorted(String v, String w){
 		float v_float = Float.parseFloat(v);
 		float w_float = Float.parseFloat(w);
