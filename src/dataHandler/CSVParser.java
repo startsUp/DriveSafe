@@ -45,7 +45,7 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 		int progress = 0;
 		boolean sorted = HandleSort.isDataSorted(MainApp.DATASET_STATUS);
 
-		long st = System.currentTimeMillis();
+		
 
 		while(i<allLines.size()) {
 
@@ -93,7 +93,6 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 			else 
 			{
 	
-			//	System.out.println(lat);
 				
 				data.add(new Violation(lineData[0],lineData[1],lineData[2], new String[] {lineData[7] , lineData[8]}, lineData[5],lineData[6],lineData[len-18]));
 				this.updateProgress(progress++, MAX_EST_PROGRESS);
@@ -108,7 +107,7 @@ public class CSVParser extends Task<ArrayList<Violation>> {
 		this.updateMessage("File Read");
 		this.succeeded();
 
-		System.out.println(System.currentTimeMillis()-st);
+		
 		
 		return data;
 

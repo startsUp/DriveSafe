@@ -44,7 +44,6 @@ public class BoundBox {
 		
 		
 		if(first_index == -1 || last_index == -1){
-			System.out.println("Could not find points in range");
 			return a;
 		}
 		else{

@@ -23,6 +23,12 @@ import sorting.SortList;
 //import traffic.*;
 import traffic.Violation;
 
+/**
+ * 
+ * Main application class. Extends javafx application to provide a GUI.
+ * @author shardool
+ *
+ */
 public class MainApp extends Application {
 
 	private Stage window;
@@ -57,6 +63,10 @@ public class MainApp extends Application {
 
 
 	}
+	
+	/**
+	 * Starts the javaFX GUI thread
+	 */
 	@Override
 	public void start(Stage mainStage) throws Exception {
 
@@ -71,8 +81,7 @@ public class MainApp extends Application {
 		
 		getLoadingScreen();
 		window.setScene(startUpScene);
-		//window.show();
-		//	window.sizeToScene();
+
 
 		parser.setOnSucceeded(e -> {
 			data = parser.getValue();
@@ -87,7 +96,6 @@ public class MainApp extends Application {
 				{
 					sortingThread.join();
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
@@ -116,7 +124,9 @@ public class MainApp extends Application {
 	}
 
 	
-	
+	/**
+	 * Once the parser is done parsing the main map GUI is shown when this method is called
+	 */
 	public void showMapScene() {
 		Map map = new Map();
 		GridPane mapView = map.getGooogleMap(data);
@@ -125,6 +135,9 @@ public class MainApp extends Application {
 		window.setScene(s);
 	}
 
+	/**
+	 * Shows the loading screen window
+	 */
 	public void getLoadingScreen()
 	{
 		loadingStage = new Stage();
@@ -136,6 +149,10 @@ public class MainApp extends Application {
 	}
 
 	
+	/**
+	 * Get loading screen 
+	 * @return Scene loading javafx scene
+	 */
 	private Scene getLoadScene()
 	{
 		Image image = new Image(new File("res/drivesafe.png").toURI().toString());

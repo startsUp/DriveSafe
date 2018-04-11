@@ -1,12 +1,21 @@
 package graphing;
 
-
+/**
+ * Class representing an Edge
+ * @author shardool
+ *
+ */
 public class Edge {
 
 	private int i;
 	private int w;
 	private int from;
-
+	
+	/**
+	 * Constructor (called automatically by gson when constructing the graph) 
+	 * @param i the index of the vertex it connects to
+	 * @param w weight of the edge
+	 */
 	public Edge(int i, int w) {
 		this.i = i;
 		this.w = i;

@@ -3,6 +3,11 @@ import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Class representing vertex
+ * @author shardool
+ *
+ */
 public class Vertex {
 	
 	@SerializedName("la")
@@ -12,6 +17,9 @@ public class Vertex {
 	@SerializedName("e")
 	private List<Edge> e;
 	
+	/**
+	 * Constructor for vertex (called automatically by gson)
+	 */
 	public Vertex() {
 		// TODO Auto-generated constructor stub
 	}

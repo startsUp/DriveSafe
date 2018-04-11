@@ -2,6 +2,11 @@ package traffic;
 
 import java.util.Arrays;
 
+/**
+ * Violation ADT
+ * @author shardool
+ *
+ */
 public class Violation {
 
 	/*
@@ -26,16 +31,20 @@ public class Violation {
 	private String[] latlong;
 	private String description;
 	private String location;
-	//private Driver driver;
-	//private Vehicle vehicle;
 	private String state;
-	private boolean fatal;
-	private String violationType;
-	private String dlState;
 	private String dateOfViolation;
 	
 	
-	
+	/**
+	 * Constructor for violation ADT
+	 * @param dateOfViolation
+	 * @param timeOfStop
+	 * @param agency
+	 * @param latlong
+	 * @param description
+	 * @param location
+	 * @param state
+	 */
 	public Violation(String dateOfViolation, String timeOfStop, String agency, String[] latlong, String description, String location, String state) {
 		
 		this.dateOfViolation = dateOfViolation;
@@ -45,59 +54,79 @@ public class Violation {
 		this.description = description;
 		this.location = location;
 		this.state = state;
-//		this.fatal = fatal;
-		
-//		this.violationType = violationType;
-//		this.dlState = dlState;
 		
 	}
 
-	
+	/**
+	 * @return String time of stop
+	 */
 	public String getTimeOfStop() {
 		return timeOfStop;
 	}
 
+	/**
+	 * @return String agency violation was reported to
+	 */
 	public String getAgency() {
 		return agency;
 	}
 
+	/**
+	 * @return String[] latlong of where the violation happened
+	 */
 	public String[] getLatlong() {
 		return latlong;
 	}
 
+	
+	/**
+	 * @return String description of violation
+	 */
 	public String getDescription() {
 		return description;
 	}
 
+	/**
+	 * 
+	 * @return String street of where violation happened
+	 */
 	public String getLocation() {
 		return location;
 	}
 	
-	public boolean isFatal() {
-		return fatal;
-	}
-	
+
+	/**
+	 * 
+	 * @return String violation state
+	 */
 	public String getState() {
 		return state;							
 	}
-	public String getViolationType() {
-		return violationType;
-	}
-
-	public String getDlState() {
-		return dlState;
-	}
-
+	
+	
+	/**
+	 * 
+	 * @return String - date of violation
+	 */
 	public String getDateOfViolation() {
 		return dateOfViolation;
 	}
 
+	
+	/**
+	 * Returns the string representation of the violation 
+	 */
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
+
 		return this.description + " " + Arrays.toString(this.getLatlong());
 	}
 	
+	
+	/**
+	 * To write back to the dataset file
+	 * @return csv format of the violation object
+	 */
 	public String csvFormat() {
 		return this.getDateOfViolation() + "," +
 			   this.getTimeOfStop() + "," +

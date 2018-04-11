@@ -4,21 +4,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Class representing a Graph
+ * @author shardool
+ *
+ */
 public class Graph {
 
 	private Vertex[] vertices;
 	private HashMap<String, List<Integer>> map;
 
-	//	public List<Vertex> getGraph() {
-	//		return graph;
-	//	}
 
+	/**
+	 * Construct a graph from the array of vertices
+	 * @param vertices
+	 */
 	public Graph(Vertex[] vertices) {
 		this.vertices = vertices;
 		map = new HashMap<>();
 		fillMap(vertices);
 	}
 
+	/**
+	 * Fills the hashmap with list of vertices that are within the 3 decimal range given by the location of vertices
+	 * @param vertices
+	 */
 	private void fillMap(Vertex[] vertices) {
 		for(int i=0; i<V(); i++)
 		{
@@ -43,18 +53,32 @@ public class Graph {
 
 	}
 
+	/**
+	 * get number of vertices
+	 * @return number of vertices
+	 */
 	public int V()
 	{
 		return vertices.length;
 	}
 
+	/**
+	 * Get ith vertex
+	 * @param i index
+	 * @return vertex at index i
+	 */
 	public Vertex getVertex(int i)
 	{
 		return vertices[i];
 	}
 
+	
+	/**
+	 * Add weight to edges if there exists violation near the vertex 
+	 * @param graph
+	 * @param weights the violation rates based on coordinates
+	 */
 	public static void addViolationWeight(Graph graph, HashMap<String, Integer> weights)
-
 	{
 
 		HashMap<String, Boolean> updatedEdges = new HashMap<>();
@@ -67,7 +91,6 @@ public class Graph {
 				key = Double.toString(v.getLa()).substring(0, 6) + Double.toString(v.getLo()).substring(0, 7); 
 
 			} catch (Exception e) {
-				System.out.println("Failed : " + v.getLa() + " " + v.getLo());
 				continue;
 			}	
 
@@ -97,22 +120,35 @@ public class Graph {
 		
 	}
 
+	/**
+	 * Returns the updated weight of the edge based on the violation rate near this edge
+	 * @param e edge 
+	 * @param violationCount
+	 * @return updated weight
+	 */
 	private static int updateWeight(Edge e, int violationCount) {
 		// TODO Auto-generated method stub
 		return e.getW()+violationCount;
 	}
 
+	
+	/**
+	 * The is an crucial method that helps with path finding. To find the exact vertex corresponding to the user-click
+	 * It uses the hashmap that was filled with fillMap() to locate the nearest vertex.
+	 * This operation takes constant time on average. 
+	 * @param lat
+	 * @param lng
+	 * @return the index of the vertex in the graph using the lat lng values
+	 */
 	public int getVertexID(String lat, String lng)
 	{
 		double lt = Double.parseDouble(lat);
 		double ln = Double.parseDouble(lng);
-		System.out.println("key" + lat + " " + lng);
 		if(lt<36 || lt>40 || ln <-79 || ln>-75) return -1; //out of data bounds
 
 		String latN = lat.substring(0, 6);
 		String lngN = lng.substring(0, 7);
 		String key  = latN+lngN;
-		System.out.println("key" + key);
 		int closest = -1;
 		double minDist = Double.MAX_VALUE;
 		if(map.containsKey(key))
@@ -133,7 +169,14 @@ public class Graph {
 		return closest;
 	}
 
-
+	/**
+	 * helper methods that returns geographical distance between set of lat long values
+	 * @param lat1
+	 * @param lon1
+	 * @param lat2
+	 * @param lon2
+	 * @return
+	 */
 	private static double distance(double lat1, double lon1, double lat2, double lon2) {
 		double theta = lon1 - lon2;
 		double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
@@ -145,6 +188,7 @@ public class Graph {
 		return (dist);
 	}
 
+	
 	private static double rad2deg(double rad) {
 		return (rad * 180 / Math.PI);
 	}
